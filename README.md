@@ -48,8 +48,92 @@ If you cloned this repository rather than generating a project from it:
 
 It is safe to re-run and never overwrites an existing `.env`.
 
-Note that this app uses native modules, so it cannot run in Expo Go — you need
-a development build (`pnpm prebuild:development`, then `pnpm ios`/`pnpm android`).
+## ▶️ Running the app
+
+> **This app cannot run in Expo Go.** It depends on native modules (Clerk,
+> expo-secure-store, MMKV, Reanimated), so you need a development build. If you
+> are used to scanning a QR code with Expo Go, that path will not work here.
+
+You need the platform toolchain for whichever target you build:
+
+| Target | Requires |
+|---|---|
+| iOS | macOS with Xcode + CocoaPods |
+| Android | Android Studio with the SDK, and JDK 17 (the version CI builds with) |
+
+Then:
+
+```bash
+./setup.sh                  # dependencies and .env
+pnpm prebuild:development   # generates the native ios/ and android/ projects
+pnpm ios                    # or: pnpm android
+```
+
+`ios/` and `android/` are generated, not committed — they are gitignored, so a
+fresh clone always starts with a prebuild. `pnpm ios` does prebuild implicitly
+when they are missing, but running `prebuild:development` first is worth doing:
+it pins `EXPO_PUBLIC_APP_ENV` and validates `.env` against the Zod schema in
+`env.ts` up front, rather than letting a missing variable surface later.
+
+Once the build is installed on the simulator or device, `pnpm start` runs the
+dev server on its own for day-to-day work.
+
+### Environments
+
+Three variants, each with its own bundle ID so they install side by side:
+
+| Environment | Start | Build and run |
+|---|---|---|
+| development (default) | `pnpm start` | `pnpm ios` / `pnpm android` |
+| preview | `pnpm start:preview` | `pnpm ios:preview` / `pnpm android:preview` |
+| production | `pnpm start:production` | `pnpm ios:production` / `pnpm android:production` |
+
+### Signing in
+
+`EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY` ships as a placeholder. The app builds and
+runs without a real one, but **sign-in will fail until you set it** — get a key
+from [the Clerk dashboard](https://dashboard.clerk.com) (Settings → API Keys)
+and put it in `.env`.
+
+### When things go wrong
+
+- **Added or upgraded a native dependency?** Re-run `pnpm prebuild:development`.
+  Metro will not pick up new native code on its own.
+- **Stale native build?** `pnpm prebuild:development --clean` regenerates from
+  scratch. Deleting `ios/` and `android/` is equivalent since they are generated.
+- **Check your setup:** `pnpm doctor` runs expo-doctor against the project.
+
+## 🤖 Agent tooling (MCP)
+
+This repo ships [Argent](https://github.com/software-mansion/argent) by Software
+Mansion — an MCP server that lets a coding agent drive a real iOS Simulator or
+Android Emulator: tap and type, read the view hierarchy, inspect network calls
+and console logs, capture screenshots, and profile performance.
+
+It is installed as a **devDependency**, so teammates get it from `pnpm install`.
+There is no global install and no `argent init` to run. The committed MCP config
+launches the project-local copy:
+
+| Client | Config |
+|---|---|
+| Claude Code | `.mcp.json` |
+| opencode | `opencode.json` |
+| VS Code | `.vscode/mcp.json` |
+
+Agents use it through the skills under `agents/skills/argent-*` (for example
+`argent-ios-simulator-setup`, then `argent-test-ui-flow`) rather than by calling
+commands by name. See `agents/commands.md` for the full list and
+`agents/rules/argent.md` for the house rules.
+
+Three things to know:
+
+- **It needs a development build and a booted simulator/emulator** (see
+  [Running the app](#️-running-the-app)). It has no role in CI.
+- **Telemetry is opted out** (`--no-telemetry` at install). Re-enable per
+  machine with `pnpm exec argent telemetry enable`.
+- Tool calls are **auto-approved** for Claude Code via `.claude/settings.json`
+  (`"allow": ["mcp__argent"]`). Delete that entry if you would rather approve
+  each simulator action by hand.
 
 ## 📋 What Gets Customized
 
