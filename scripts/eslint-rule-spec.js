@@ -1,23 +1,29 @@
 /**
  * ESLint rule: every module under src/features/, src/lib/ and the
- * src/components/ui/ design system must carry a spec.md (features also need a
- * decisions.md).
+ * src/components/ui/ design system must carry a spec.md and a decisions.md.
+ * scripts/spec-modules.js owns the module map and the per-module document
+ * list, so this rule and scripts/check-specs.js can not drift apart.
  *
  * The rule reports once per module rather than once per file, so a 12-file
  * feature missing a spec produces one error instead of twelve. The bookkeeping
  * lives at module scope because ESLint creates a fresh rule context per file;
  * it is reset after a period of inactivity so that a long-lived language
  * server picks up newly created spec files instead of caching forever.
+ *
+ * This rule only sees the files eslint.config.mjs routes to it. It cannot see
+ * spec drift (whether spec.md was updated alongside a code change) — that is
+ * git-diff shaped and lives in scripts/check-specs.js.
  */
 
 const fs = require('node:fs');
 const path = require('node:path');
 
-// src/components/ui is ONE module: individual primitives do not get their own
-// spec, the inventory at src/components/ui/spec.md covers all of them.
-const UI_MODULE = 'src/components/ui';
-// These, in contrast, are namespaces: each direct subdirectory is a module.
-const MODULE_PARENTS = ['src/features/', 'src/lib/'];
+const {
+  DECISIONS_FILE,
+  getModuleDir,
+  requiredDocs,
+  SPEC_FILE,
+} = require('./spec-modules.js');
 
 const RUN_IDLE_MS = 5000;
 
@@ -43,50 +49,26 @@ function exists(filePath) {
   return hit;
 }
 
-/**
- * Map a repo-relative file path to the module directory that owns it.
- * Returns null when the file belongs to no module — notably for loose files
- * sitting directly in src/features/ or src/lib/ (e.g. src/lib/storage.tsx),
- * which are not modules of their own.
- */
-function findModuleDir(relPath) {
-  const p = relPath.replaceAll('\\', '/');
-
-  if (p.startsWith(`${UI_MODULE}/`)) {
-    return UI_MODULE;
-  }
-
-  for (const base of MODULE_PARENTS) {
-    if (!p.startsWith(base)) {
-      continue;
-    }
-    const rest = p.slice(base.length);
-    const slash = rest.indexOf('/');
-    // No slash left => a loose file directly inside src/features/ or src/lib/.
-    if (slash <= 0) {
-      return null;
-    }
-    return base + rest.slice(0, slash);
-  }
-
-  return null;
-}
+const MESSAGE_ID = {
+  [SPEC_FILE]: 'missingSpec',
+  [DECISIONS_FILE]: 'missingDecisions',
+};
 
 module.exports = {
   meta: {
     type: 'problem',
-    docs: { description: 'Enforce spec.md exists for feature/lib/ui modules' },
+    docs: { description: 'Enforce spec.md and decisions.md exist for feature/lib/ui modules' },
     schema: [],
     messages: {
-      missingSpec: 'Module "{{dir}}" has testable behavior but no spec.md. Create spec.md and decisions.md.',
-      missingDecisions: 'Module "{{dir}}" has spec.md but no decisions.md. Create decisions.md.',
+      missingSpec: 'Module "{{dir}}" has testable behavior but no spec.md. Create spec.md describing what it does today.',
+      missingDecisions: 'Module "{{dir}}" has no decisions.md. Create it and record the trade-offs behind the module.',
     },
   },
   create(context) {
     const projectRoot = context.settings?.rootDir || context.cwd || process.cwd();
     const relPath = path.relative(projectRoot, context.filename);
 
-    const moduleDir = findModuleDir(relPath);
+    const moduleDir = getModuleDir(relPath);
     if (!moduleDir) {
       return {};
     }
@@ -98,16 +80,14 @@ module.exports = {
           return;
         }
 
-        const specPath = path.join(projectRoot, moduleDir, 'spec.md');
-        const decisionsPath = path.join(projectRoot, moduleDir, 'decisions.md');
-
-        if (!exists(specPath)) {
-          reportedModules.add(moduleDir);
-          context.report({ node, messageId: 'missingSpec', data: { dir: moduleDir } });
-        }
-        else if (moduleDir.startsWith('src/features/') && !exists(decisionsPath)) {
-          reportedModules.add(moduleDir);
-          context.report({ node, messageId: 'missingDecisions', data: { dir: moduleDir } });
+        // Report the first missing document only: one error per module keeps
+        // the output readable, and creating it surfaces the next one.
+        for (const doc of requiredDocs(moduleDir)) {
+          if (!exists(path.join(projectRoot, moduleDir, doc))) {
+            reportedModules.add(moduleDir);
+            context.report({ node, messageId: MESSAGE_ID[doc], data: { dir: moduleDir } });
+            return;
+          }
         }
       },
     };

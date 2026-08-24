@@ -120,7 +120,7 @@ launches the project-local copy:
 | opencode | `opencode.json` |
 | VS Code | `.vscode/mcp.json` |
 
-Agents use it through the skills under `agents/skills/argent-*` (for example
+Agents use it through the skills under `.agents/skills/argent-*` (for example
 `argent-ios-simulator-setup`, then `argent-test-ui-flow`) rather than by calling
 commands by name. See `agents/commands.md` for the full list and
 `agents/rules/argent.md` for the house rules.

@@ -3,9 +3,18 @@
  * Spec drift check.
  *
  * Every module under src/features/<name>/, src/lib/<name>/ and the
- * src/components/ui/ design system must carry a spec.md (and, for features,
- * a decisions.md). This script looks at what changed and fails when a changed
- * module has no spec.
+ * src/components/ui/ design system must carry a spec.md AND a decisions.md.
+ * src/app/ is the one decisions-only module: routes are re-exports, so their
+ * behavior belongs to the feature's spec, but routing structure and guard
+ * ordering are real decisions and go in src/app/decisions.md.
+ * scripts/spec-modules.js owns that map; this script only applies it.
+ *
+ * This script looks at what changed and fails when a changed module either
+ *   - is missing one of the documents it owes, or
+ *   - had code change without its spec.md changing in the same set
+ *     (the actual "drift" in drift check — see agents/rules/ci-cd-rules.md).
+ * decisions.md is existence-only: it is append-only and only for genuine
+ * trade-offs, so demanding an entry per change would manufacture noise.
  *
  * Usage:
  *   node scripts/check-specs.js                 # staged changes, falling back
@@ -18,11 +27,17 @@ const { execFileSync } = require('node:child_process');
 const fs = require('node:fs');
 const path = require('node:path');
 
-// src/components/ui is ONE module: individual primitives do not get their own
-// spec, the inventory at src/components/ui/spec.md covers all of them.
-const UI_MODULE = 'src/components/ui';
-// These, in contrast, are namespaces: each direct subdirectory is a module.
-const MODULE_PARENTS = ['src/features/', 'src/lib/'];
+const {
+  getModuleDir,
+  isModuleDoc,
+  requiredDocs,
+  SPEC_FILE,
+} = require('./spec-modules.js');
+
+const WHY = {
+  'spec.md': 'describe what the module does today',
+  'decisions.md': 'record the trade-offs behind it',
+};
 
 function parseArgs(argv) {
   let base = null;
@@ -61,35 +76,6 @@ function repoRoot() {
 }
 
 /**
- * Map a repo-relative file path to the module directory that owns it.
- * Returns null when the file belongs to no module — notably for loose files
- * sitting directly in src/features/ or src/lib/ (e.g. src/lib/storage.tsx),
- * which are not modules of their own.
- */
-function getModuleDir(file) {
-  const p = file.replaceAll('\\', '/');
-
-  if (p.startsWith(`${UI_MODULE}/`)) {
-    return UI_MODULE;
-  }
-
-  for (const base of MODULE_PARENTS) {
-    if (!p.startsWith(base)) {
-      continue;
-    }
-    const rest = p.slice(base.length);
-    const slash = rest.indexOf('/');
-    // No slash left => a loose file directly inside src/features/ or src/lib/.
-    if (slash <= 0) {
-      return null;
-    }
-    return base + rest.slice(0, slash);
-  }
-
-  return null;
-}
-
-/**
  * Collect the changed files to inspect.
  * --diff-filter=ACMR skips deletions, so removing a feature folder (which also
  * removes its spec.md) does not report that spec as missing.
@@ -123,34 +109,69 @@ function collectChanges(root, base) {
   };
 }
 
+/**
+ * Group the changed files by owning module, splitting each module's changes
+ * into its own documents and everything else ("code").
+ */
+function groupByModule(files) {
+  const modules = new Map();
+  for (const file of files) {
+    const mod = getModuleDir(file);
+    if (!mod) {
+      continue;
+    }
+    let entry = modules.get(mod);
+    if (!entry) {
+      entry = { changedDocs: new Set(), codeChanged: false };
+      modules.set(mod, entry);
+    }
+    if (isModuleDoc(file)) {
+      entry.changedDocs.add(path.posix.basename(file.replaceAll('\\', '/')));
+    }
+    else {
+      entry.codeChanged = true;
+    }
+  }
+  return modules;
+}
+
+function inspect(root, modules) {
+  const problems = [];
+
+  for (const mod of [...modules.keys()].sort()) {
+    const { changedDocs, codeChanged } = modules.get(mod);
+    const required = requiredDocs(mod);
+
+    for (const doc of required) {
+      if (!fs.existsSync(path.join(root, mod, doc))) {
+        problems.push({
+          file: `${mod}/${doc}`,
+          message: `${mod} changed but has no ${doc} — ${WHY[doc]}`,
+        });
+      }
+    }
+
+    // Drift: code moved, the spec did not. Only meaningful once the spec
+    // exists (otherwise the missing-file problem above already says it).
+    const needsSpec = required.includes(SPEC_FILE)
+      && fs.existsSync(path.join(root, mod, SPEC_FILE));
+    if (codeChanged && needsSpec && !changedDocs.has(SPEC_FILE)) {
+      problems.push({
+        file: `${mod}/${SPEC_FILE}`,
+        message: `${mod} has code changes but ${mod}/${SPEC_FILE} is untouched — rewrite it to describe the new behavior (or state why nothing observable changed)`,
+      });
+    }
+  }
+
+  return problems;
+}
+
 function main() {
   const { base } = parseArgs(process.argv.slice(2));
   const root = repoRoot();
   const { label, files } = collectChanges(root, base);
-
-  const modules = new Set();
-  for (const file of files) {
-    const mod = getModuleDir(file);
-    if (mod) {
-      modules.add(mod);
-    }
-  }
-
-  const problems = [];
-  for (const mod of [...modules].sort()) {
-    if (!fs.existsSync(path.join(root, mod, 'spec.md'))) {
-      problems.push({
-        file: `${mod}/spec.md`,
-        message: `${mod} changed but has no spec.md — describe what the module does today`,
-      });
-    }
-    if (mod.startsWith('src/features/') && !fs.existsSync(path.join(root, mod, 'decisions.md'))) {
-      problems.push({
-        file: `${mod}/decisions.md`,
-        message: `${mod} changed but has no decisions.md — record the trade-offs behind it`,
-      });
-    }
-  }
+  const modules = groupByModule(files);
+  const problems = inspect(root, modules);
 
   if (problems.length > 0) {
     console.error(`check-specs: ${problems.length} problem(s) in ${label}\n`);
@@ -164,7 +185,7 @@ function main() {
     process.exit(1);
   }
 
-  console.log(`check-specs: ${modules.size} module(s) checked in ${label} — all specs present.`);
+  console.log(`check-specs: ${modules.size} module(s) checked in ${label} — specs present and in sync.`);
 }
 
 try {
