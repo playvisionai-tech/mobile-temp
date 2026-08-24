@@ -15,7 +15,8 @@ next `git pull`.
 
 Lookups live beside this file:
 - [`native-modules.md`](native-modules.md) — is it native, version pinning, prebuild, Jest
-- [`wrappers.md`](wrappers.md) — the existing wrappers, including the two that leak
+- [`wrappers.md`](wrappers.md) — the existing wrappers: one model, one deliberate
+  partial, one bare re-export
 
 ## 1. Gate — propose, then wait
 
@@ -122,8 +123,10 @@ entire API is one component rendered once. When skipping the wrapper, write one
 line in the relevant `decisions.md` saying it was a choice — otherwise "no
 wrapper" is indistinguishable from "forgot".
 
-Read [`wrappers.md`](wrappers.md) before writing one. Two of the three wrappers
-already in this repo leak, and knowing how is more instructive than the rule.
+Read [`wrappers.md`](wrappers.md) before writing one. Of the three it walks
+through, one is the model, one is a partial chosen on purpose, and one is a bare
+re-export that contains nothing. Telling them apart is more instructive than the
+rule.
 
 ## 5. Verify
 
@@ -137,7 +140,8 @@ pnpm doctor        # expo-doctor: SDK alignment + RN Directory
 
 `pnpm check-all` runs the first four plus `lint:translations`, but **not**
 `doctor`. Run `doctor` separately whenever `package.json` changed — CI does,
-and `expo-doctor.yml` is the one workflow that actually builds native.
+and `expo-doctor.yml` is the only job on a default PR run that touches native at
+all: it runs a real `pnpm run prebuild`.
 
 For a native module, none of the above proves it works. Build and run it on a
 real simulator, and drive the affected screens (see `agents/rules/argent.md`).

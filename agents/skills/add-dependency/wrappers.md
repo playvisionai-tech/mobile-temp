@@ -3,8 +3,8 @@
 Read this before writing a wrapper. The rule is in
 [`SKILL.md`](SKILL.md) §4; this is what it looks like in practice here.
 
-Three third-party libraries are wrapped in this repo today. One is the model.
-The other two show the two ways a wrapper stops being one.
+Three of this repo's wrappers are worth reading before you write one. One is the
+model. The other two show the two ways a wrapper stops being one.
 
 ## `expo-image` → `src/components/ui/image.tsx` — the model
 
@@ -63,7 +63,7 @@ Three files import `@shopify/flash-list` directly:
 - `src/components/ui/select.tsx`
 - `src/lib/test-utils.tsx`
 
-So a FlashList swap is a four-file change plus this alias. The indirection
+So a FlashList swap is a three-file change plus this alias. The indirection
 exists, costs maintenance, and delivers nothing.
 
 Two lessons, and they are the reason §4 is written the way it is:
@@ -94,8 +94,11 @@ component in `src/components/ui/`, and let the component import the module.
 - **Build-time and config-only packages** — config plugins, Babel plugins,
   `app-icon-badge`. They never appear in `src/`.
 - **Type-only dependencies.**
-- **A package whose whole API is one component rendered once**, e.g.
-  `react-native-flash-message`'s `<FlashMessage />`.
+- **A package whose whole API is one component rendered once.**
+  `react-native-flash-message`'s `<FlashMessage />` host qualifies; its
+  `showMessage` does not, and is half-wrapped by `showError` /
+  `showErrorMessage` in `src/components/ui/utils.tsx` and called raw from
+  `src/features/feed/add-post-screen.tsx`.
 
 In each case write one line in the relevant `decisions.md` recording that the
 wrapper was skipped on purpose. Otherwise the next person cannot tell the

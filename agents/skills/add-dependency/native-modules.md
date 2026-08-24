@@ -94,6 +94,9 @@ no ordered pipeline. Relevant here:
 - `lint-ts.yml`, `type-check.yml`, `test.yml`, `drift-check.yml` never build
   native code. A native module can break every simulator in the team while all
   four stay green.
-- The Android E2E workflows are label-gated and do not run by default.
+- Two of the three Android E2E workflows are label-gated (`android-test-github`,
+  `android-test-maestro-cloud`); the third is `workflow_dispatch` only. None run
+  by default. The EAS build workflows do build native, but only on manual
+  dispatch or a published release — never on a PR.
 
 So a green PR is not evidence that a native module works. Only a device run is.
