@@ -102,8 +102,20 @@ instead of raw colors), or isolate the swap to one file.
 Then:
 
 1. Import the package in the wrapper **and nowhere else**.
-2. UI primitive → export it from `src/components/ui/index.tsx` (the only barrel
-   the project allows) **and add its row to `src/components/ui/spec.md`**.
+2. Anything landing in `src/components/ui/` → **add its row to
+   `src/components/ui/spec.md`**. The inventory is the discovery mechanism and
+   is not optional.
+   Whether it also goes in the barrel (`index.tsx`, the only one the project
+   allows) is a separate call:
+   - **Barrel it** if it is a component call sites render — `Button`, `Text`,
+     `Image`, `List`.
+   - **Import it by path** if it is a lookup, a hook, or a helper, or if it
+     pulls a heavy or native dependency. `export *` is eager: barrelling a
+     module that imports a native package initializes that package in every
+     file that imports *anything* from `@/components/ui`, including `Text`.
+     Existing precedent — `use-theme-config.tsx`, `form-utils.ts`,
+     `modal-keyboard-aware-scroll-view.tsx` and `tab-icons.tsx` are all in
+     `components/ui/` and none are barrelled.
 3. New `src/lib/<name>/` module → it needs its own `spec.md` and `decisions.md`.
    `check-specs` fails without both.
 4. Respect the promotion rule: a component moves into `components/ui/` once
