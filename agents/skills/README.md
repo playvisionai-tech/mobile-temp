@@ -4,7 +4,7 @@ Topic notes for the agent, one folder per topic. Each `README.md` maps a short
 label to the real command that runs it. `agents/commands.md` is the same set in
 one file — read that first if you just need a command.
 
-**Nothing here is a loadable skill.** A loadable skill is a `SKILL.md` with
+**Only `add-dependency/` is a loadable skill.** A loadable skill is a `SKILL.md` with
 frontmatter; these folders hold a `README.md` only. `.claude/skills` symlinks to
 this directory, so they appear alongside real skills, but no agent can invoke
 them by name.
@@ -13,6 +13,7 @@ them by name.
 
 | Folder     | Covers                                                    |
 |------------|-----------------------------------------------------------|
+| `add-dependency/` | **loadable skill** — adding a dependency or native module |
 | `expo/`    | setup, prebuild, dev server, doctor, run on device         |
 | `testing/` | jest, coverage, Maestro E2E, React Query devtools          |
 | `lint/`    | eslint, type-check, translation lint, spec drift check     |

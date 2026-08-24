@@ -33,6 +33,7 @@ __tests__/        One per directory that has something to test.
 | login, tokens, session                  | src/lib/auth/spec.md + decisions.md           |
 | copy, locales, RTL                      | src/lib/i18n/spec.md                          |
 | writing any test                        | src/lib/test-utils.tsx                        |
+| adding a dependency or native module    | agents/skills/add-dependency/SKILL.md         |
 | commands / scripts                      | agents/commands.md                            |
 | running the app, simulator, device      | README.md → "Running the app"                 |
 | driving a real simulator (Argent MCP)   | agents/rules/argent.md                        |
@@ -99,6 +100,10 @@ fix the spec in the same change.
 - New dependency, native module, or config change without asking.
 
 ## Ask first
+
+**Procedure for all three of the below: `agents/skills/add-dependency/SKILL.md`.**
+It covers the gate, `expo install` vs `pnpm add`, wrapping the dependency, and
+rollback. Read it before proposing, not after approval.
 
 - Adding a native module (requires a new dev client build — say so explicitly)
 - Changes to app.config.ts, eas.json, or env.ts
