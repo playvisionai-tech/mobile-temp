@@ -1,9 +1,10 @@
+/* eslint-disable max-lines-per-function */
 import type { OptionType } from '@/components/ui';
 
 import * as React from 'react';
-import { cleanup, render, screen, setup } from '@/lib/test-utils';
+import { cleanup, render, screen, setup, within } from '@/lib/test-utils';
 
-import { Select } from './select';
+import { Options, Select } from '../select';
 
 afterEach(cleanup);
 
@@ -58,6 +59,55 @@ describe('select component ', () => {
     expect(screen.getByTestId('select-error')).toHaveTextContent(
       'Please select an option',
     );
+  });
+
+  it('renders label and error copy without requiring a test identifier', () => {
+    render(<Select label="Flavor" error="Choose one" />);
+
+    expect(screen.getByText('Flavor')).toBeOnTheScreen();
+    expect(screen.getByText('Choose one')).toBeOnTheScreen();
+  });
+
+  it('marks the current option and reports the selected option object', async () => {
+    const onSelect = jest.fn();
+    const { user } = setup(
+      <Options options={options} value="strawberry" onSelect={onSelect} />,
+    );
+
+    await user.press(screen.getByText('Strawberry'));
+
+    expect(onSelect).toHaveBeenCalledWith(options[1]);
+  });
+
+  it('shows the selected option label', () => {
+    render(<Select options={options} value="strawberry" testID="select" />);
+
+    expect(
+      within(screen.getByTestId('select-trigger')).getByText('Strawberry'),
+    ).toBeOnTheScreen();
+  });
+
+  it('falls back to the placeholder when its value is unknown', () => {
+    render(
+      <Select
+        options={options}
+        value="mint"
+        placeholder="Choose a flavor"
+        testID="select"
+      />,
+    );
+
+    expect(screen.getByText('Choose a flavor')).toBeOnTheScreen();
+  });
+
+  it('does not open while disabled', async () => {
+    const { user } = setup(
+      <Select options={options} disabled testID="select" />,
+    );
+
+    await user.press(screen.getByTestId('select-trigger'));
+
+    expect(screen.getByTestId('select-trigger')).toBeDisabled();
   });
 
   it('should open options modal on press', async () => {

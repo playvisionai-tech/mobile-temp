@@ -54,7 +54,13 @@ function getModuleDir(file) {
     if (slash <= 0) {
       return null;
     }
-    return base + rest.slice(0, slash);
+    const moduleName = rest.slice(0, slash);
+    // Tests for loose namespace files live in src/{features,lib}/__tests__.
+    // That directory is placement infrastructure, not a feature/lib module.
+    if (moduleName === '__tests__') {
+      return null;
+    }
+    return base + moduleName;
   }
 
   return null;

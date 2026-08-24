@@ -1,6 +1,19 @@
 /* eslint-disable ts/ban-ts-comment */
 /* eslint-disable no-restricted-globals */
 
+// TanStack Form's devtools event client starts a reconnect interval whenever a
+// form emits an event. Jest has no devtools bus to connect to, so use the
+// boundary's no-op contract and keep workers free of leaked timers.
+jest.mock('@tanstack/devtools-event-client', () => ({
+  EventClient: class {
+    emit() {}
+
+    on() {
+      return () => {};
+    }
+  },
+}));
+
 // Mock react-native-worklets first
 jest.mock('react-native-worklets', () => ({
   __esModule: true,
@@ -76,6 +89,7 @@ jest.mock('react-native-mmkv', () => ({
     getString: jest.fn(),
     getNumber: jest.fn(),
     getBoolean: jest.fn(),
+    remove: jest.fn(),
     delete: jest.fn(),
     clearAll: jest.fn(),
     getAllKeys: jest.fn(() => []),
@@ -89,6 +103,7 @@ jest.mock('react-native-mmkv', () => ({
     getString: jest.fn(),
     getNumber: jest.fn(),
     getBoolean: jest.fn(),
+    remove: jest.fn(),
     delete: jest.fn(),
     clearAll: jest.fn(),
     getAllKeys: jest.fn(() => []),
