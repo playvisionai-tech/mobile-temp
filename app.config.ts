@@ -115,6 +115,12 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     'expo-router',
     'expo-secure-store',
     '@clerk/expo',
+    // Repoints Android's AppTheme at Theme.Material3.DayNight.NoActionBar,
+    // which the native BottomNavigationView requires. Android-only; no iOS mod.
+    'react-native-bottom-tabs',
+    // Registers the Material Design Icons font. The native tab bar rasterizes
+    // glyphs from it on Android — see components/ui/tab-icons.tsx.
+    '@react-native-vector-icons/material-design-icons',
     ['app-icon-badge', appIconBadgeConfig],
     ['react-native-edge-to-edge'],
   ],

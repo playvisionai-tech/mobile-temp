@@ -14,6 +14,7 @@ barrel file the project allows.
 | `Select` / `Options` | Choosing one value from a list (bottom-sheet picker) | Free text → `Input` |
 | `Checkbox` / `Radio` / `Switch` | Boolean and single-choice toggles (from `checkbox.tsx`) | Actions → `Button` |
 | `Modal` / `useModal` | Bottom-sheet dialogs (@gorhom) | Full-screen → push a route |
+| `getTabIcon` (`tab-icons.tsx`) | Icons for the **native** tab bar; returns an SF Symbol on iOS, a rasterized Material glyph on Android | In-app UI → the SVG components in `icons/` |
 | `List` / `EmptyList` / `NoData` | Scrolling collections (FlashList) and their empty states | Static content → `ScrollView` |
 | `Image` / `preloadImages` | Remote and local images (expo-image) | Icons → `@/components/ui/icons` |
 | `ProgressBar` | Determinate progress | Indeterminate → `ActivityIndicator` |

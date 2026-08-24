@@ -1,14 +1,27 @@
+import type {
+  NativeBottomTabNavigationEventMap,
+  NativeBottomTabNavigationOptions,
+} from '@bottom-tabs/react-navigation';
+import type { ParamListBase, TabNavigationState } from '@react-navigation/native';
+import { createNativeBottomTabNavigator } from '@bottom-tabs/react-navigation';
 import { useAuth } from '@clerk/expo';
-import { Link, Redirect, Tabs } from 'expo-router';
+import { Redirect, withLayoutContext } from 'expo-router';
 import * as React from 'react';
 
-import { Pressable, Text } from '@/components/ui';
-import {
-  Feed as FeedIcon,
-  Settings as SettingsIcon,
-  Style as StyleIcon,
-} from '@/components/ui/icons';
+import { getTabIcon } from '@/components/ui/tab-icons';
 import { useIsFirstTime } from '@/lib/hooks/use-is-first-time';
+
+// The navigator is mounted exactly once, here, which is why it is not wrapped:
+// Expo Router requires it to be declared in the layout. The icons ARE wrapped —
+// see components/ui/tab-icons.tsx.
+const { Navigator } = createNativeBottomTabNavigator();
+
+const Tabs = withLayoutContext<
+  NativeBottomTabNavigationOptions,
+  typeof Navigator,
+  TabNavigationState<ParamListBase>,
+  NativeBottomTabNavigationEventMap
+>(Navigator);
 
 export default function TabLayout() {
   const { isSignedIn, isLoaded } = useAuth();
@@ -31,8 +44,7 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Feed',
-          tabBarIcon: ({ color }) => <FeedIcon color={color} />,
-          headerRight: () => <CreateNewPostLink />,
+          tabBarIcon: () => getTabIcon('feed'),
           tabBarButtonTestID: 'feed-tab',
         }}
       />
@@ -41,8 +53,7 @@ export default function TabLayout() {
         name="style"
         options={{
           title: 'Style',
-          headerShown: false,
-          tabBarIcon: ({ color }) => <StyleIcon color={color} />,
+          tabBarIcon: () => getTabIcon('style'),
           tabBarButtonTestID: 'style-tab',
         }}
       />
@@ -50,21 +61,10 @@ export default function TabLayout() {
         name="settings"
         options={{
           title: 'Settings',
-          headerShown: false,
-          tabBarIcon: ({ color }) => <SettingsIcon color={color} />,
+          tabBarIcon: () => getTabIcon('settings'),
           tabBarButtonTestID: 'settings-tab',
         }}
       />
     </Tabs>
-  );
-}
-
-function CreateNewPostLink() {
-  return (
-    <Link href="/feed/add-post" asChild>
-      <Pressable>
-        <Text className="px-3 text-primary-300">Create</Text>
-      </Pressable>
-    </Link>
   );
 }

@@ -1,32 +1,36 @@
 # CI/CD Rules
 
 ## Rule
-- **CI order** — run `type-check → lint → unit tests → E2E`.
-- **Drift check** — CI blocks PR if code under `features/**`, `lib/**`, `components/ui/**` changes without corresponding `spec.md` update.
+- **CI runs in parallel, not in sequence.** `.github/workflows/` holds independent workflows — `lint-ts`, `type-check`, `test`, `drift-check`, the EAS build and E2E ones — each triggering on its own. There is no `ci.yml` and nothing sequences them, so expect several failures at once rather than the first one only.
+- **Local order** — `pnpm check-all` runs `lint → type-check → lint:translations → test → check-specs` and stops at the first failure. That ordering is a local-loop convention, not what CI does.
+- **Drift check** — CI blocks a PR if code in a module (`src/features/*`, `src/lib/*`, `src/components/ui`, `src/app`) changes without its `spec.md` changing too. `scripts/spec-modules.js` defines what counts as a module.
 - **Spec freshness** — when behavior changes, rewrite `spec.md` to reflect new reality (present tense, never append "we added X"). Append to `decisions.md` only for genuine trade-offs.
 
 ## Rationale
-Fixed CI order catches type errors before lint, lint before tests. Drift check ensures documentation stays current. Spec freshness prevents stale docs from misleading agents and engineers.
+Parallel workflows give the whole verdict on one push instead of one failure per round-trip. The local order is the cheap-first ordering for a human loop. Drift check ensures documentation stays current. Spec freshness prevents stale docs from misleading agents and engineers.
 
 ## Examples
 
 ### Good (PR passes)
+```bash
+# Locally, before pushing — same checks CI runs, in a cheap-first order.
+pnpm check-all
+```
+
 ```yaml
-# .github/workflows/ci.yml
-jobs:
-  check:
-    steps:
-      - run: pnpm type-check   # 1
-      - run: pnpm lint         # 2
-      - run: pnpm test         # 3
-      - run: pnpm check-specs  # 4 (drift check)
+# .github/workflows/drift-check.yml — one workflow per check, all independent.
+# It runs the identical script `pnpm check-specs` runs locally.
+- name: Check spec updates
+  env:
+    BASE_REF: ${{ github.base_ref }}
+  run: node scripts/check-specs.js --base "origin/$BASE_REF"
 ```
 
 ```markdown
 # spec.md (rewritten)
 ## Behavior
 - User can sign in with email/password
-- Session persists across app restarts via MMKV
+- Session persists across app restarts via Clerk's token cache (expo-secure-store)
 - On 401, user is signed out and redirected to login
 ```
 
@@ -54,7 +58,8 @@ We changed auth to use Clerk because it's better.  # ❌ No trade-off, no altern
 ```
 
 ## Enforcement
-- CI: `.github/workflows/drift-check.yml` blocks PR on missing spec update
-- CI: `.github/workflows/ci.yml` runs in fixed order
+- CI: `.github/workflows/drift-check.yml` blocks a PR on a missing or unchanged spec
+- CI: `lint-ts.yml`, `type-check.yml` and `test.yml` run independently on the same PR
+- ESLint: `local/spec-required` gives the same feedback in the editor and in `pnpm lint`
 - Review: verify spec.md rewritten (not appended), decisions.md appended only for trade-offs
-- Local: `pnpm check-specs` in husky pre-commit
+- Local: **`.husky/pre-commit` runs `pnpm type-check` and `pnpm lint-staged` only — it does not run `check-specs`.** Run `pnpm check-specs` yourself before committing, or CI will be the first to tell you.

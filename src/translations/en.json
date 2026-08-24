@@ -1,4 +1,8 @@
 {
+  "feed": {
+    "create": "Create",
+    "title": "Feed"
+  },
   "login": {
     "failed": "Sign in failed. Check your email and password."
   },
