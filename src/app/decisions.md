@@ -1,11 +1,11 @@
 # Routing — decisions
 
-`src/app/` is Expo Router's file tree. Every file here is a re-export, so the
-*behavior* behind a route is described by the spec of the feature it points at
-(`src/features/<f>/spec.md`) — this directory has no `spec.md` of its own and
-a duplicate one would only go stale. Navigation structure, route grouping and
-guard ordering are still real architectural choices with no other home, and
-they live here.
+`src/app/` is Expo Router's file tree. The *behavior* behind a route is
+described by the spec of the feature it points at (`src/features/<f>/spec.md`);
+`src/app/spec.md` is the route inventory beside this file — which URLs exist and
+which screen each renders — and deliberately not a copy of those specs.
+Navigation structure, route grouping and guard ordering are architectural
+choices with no other home, and they live here.
 
 Entries below the 2026-08 line predate this file. They were reconstructed from
 the code and from the commits that introduced each choice (referenced inline);
@@ -35,8 +35,8 @@ nothing here is invented rationale.
 **Why:** `onLayout` is the first point at which the tree has actually been laid out, so the splash covers the whole mount instead of uncovering a blank frame. The ref guard matters because `onLayout` fires again on rotation and on keyboard-driven resizes.
 **Trade-off:** The splash is tied to the root view laying out, not to the app being *ready* — the `(app)` guard can still render `null` while Clerk restores the session, so a brief empty screen after the splash is possible. Fixing that would mean holding the splash until `isLoaded`, which couples the root layout to auth.
 
-## 2026-08-24 — Routing decisions live here, in `src/app/decisions.md`
-**Chose:** Treat `src/app/` as a decisions-only module: `scripts/check-specs.js` requires a `decisions.md` here and no `spec.md`
-**Over:** Recording routing decisions in the nearest feature's `decisions.md`, or in a repo-level architecture document
-**Why:** AGENTS.md says to put a decision where the code it constrains lives, and no feature owns the navigator — the `(app)` guard constrains auth, onboarding and every tab at once. Filing it under one feature hides it from the others; filing it in a repo-level doc puts it where nobody editing `_layout.tsx` will look.
-**Trade-off:** `src/app/` is now a module in a system that otherwise means "feature or lib module", and it is the one asymmetric member (decisions, no spec) — the module map in `scripts/spec-modules.js` has to special-case it. Some overlap with feature decisions is unavoidable: the session-restore window is argued in `src/features/auth/decisions.md` because that is where the trade-off was made, and only its routing consequence is stated here.
+## 2026-08-24 — `src/app/` is a full module: route inventory plus decisions
+**Chose:** Treat `src/app/` like every other module — `scripts/check-specs.js` requires both a `spec.md` (the route inventory) and a `decisions.md` here
+**Over:** (a) recording routing decisions in the nearest feature's `decisions.md` or a repo-level architecture document; (b) making `src/app/` decisions-only, with no `spec.md`, on the grounds that routes are re-exports
+**Why:** AGENTS.md says to put a decision where the code it constrains lives, and no feature owns the navigator — the `(app)` guard constrains auth, onboarding and every tab at once. Filing it under one feature hides it from the others; filing it in a repo-level doc puts it where nobody editing `_layout.tsx` will look. Option (b) was taken first and reversed before this branch landed: it rested on "every file here is a re-export", which is false. Four of the eleven files are not — both `_layout.tsx` files, the inline `NotFoundScreen` in `[...messing].tsx`, and `+html.tsx` — and the navigator shape, provider order and guard sequence are observable behavior that no feature spec describes. An inventory of which URLs exist is also the thing a newcomer actually needs and cannot get by reading eleven one-line files.
+**Trade-off:** `src/app/spec.md` can drift into restating feature behavior; it is scoped to *what routes exist and what they render*, and the feature specs stay authoritative for screen behavior. The drift rule now also fires on `src/app`, so moving a route means touching the inventory in the same commit — deliberate, since a stale route table is worse than none. Some overlap with feature decisions is unavoidable: the session-restore window is argued in `src/features/auth/decisions.md` because that is where the trade-off was made, and only its routing consequence is stated here.

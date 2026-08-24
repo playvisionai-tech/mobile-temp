@@ -81,6 +81,7 @@ export default antfu(
             'ISSUE_TEMPLATE.md',
             'PULL_REQUEST_TEMPLATE.md',
             'AGENTS.md',
+            'ARCHITECTURE.md',
             'CLAUDE.md',
           ],
         },

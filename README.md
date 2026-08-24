@@ -12,6 +12,11 @@
 
 > Welcome to the Obytes Mobile Tribe's Expo / React Native Starter Kit!
 
+**New to the codebase?** [`ARCHITECTURE.md`](./ARCHITECTURE.md) is the one place
+to start: feature slices, the runtime stack, the provider tree, where state
+lives, and the spec system that keeps the docs honest. This README covers
+running the app; that file covers how it is built.
+
 ## 🚀 Getting Started
 
 To create a new project using this template, run:
@@ -180,7 +185,7 @@ When creating this starter kit, we had several guiding principles in mind::
 - 🚫 Lint-staged: Run Eslint and TypeScript checks on Git staged files to maintain code quality.
 - 🗂 VSCode recommended extensions, settings, and snippets for an enhanced developer experience.
 - ☂️ Pre-installed [Expo Router](https://docs.expo.dev/router/introduction/) with examples for comprehensive app navigation.
-- 💫 Auth flow implementation using [Zustand](https://github.com/pmndrs/zustand) for state management and [react-native-mmkv](https://github.com/mrousavy/react-native-mmkv) for secure data storage.
+- 💫 Auth flow implementation using [Clerk](https://clerk.com/), with the session persisted in [expo-secure-store](https://docs.expo.dev/versions/latest/sdk/securestore/) via Clerk's token cache. [react-native-mmkv](https://github.com/mrousavy/react-native-mmkv) holds durable client state (theme, first-run flag) — no tokens.
 - 🛠 10+ [Github Actions](https://github.com/features/actions) workflows for building, releasing, testing, and distributing your app.
 - 🔥 [React Query](https://react-query.tanstack.com/) and [axios](https://github.com/axios/axios) for efficient data fetching and state management.
 - 🧵 Robust form handling with [TanStack Form](https://tanstack.com/form/latest) and [zod](https://github.com/colinhacks/zod) for validation, plus keyboard handling.

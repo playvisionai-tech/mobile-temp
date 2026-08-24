@@ -1,17 +1,17 @@
 # Quality Standards
 
 ## Rule
-- **Styling via NativeWind** — use Tailwind class names and theme tokens only. No hex values, no magic spacing numbers.
+- **Styling via uniwind** — use Tailwind class names and theme tokens only. No hex values, no magic spacing numbers. The theme is the `@theme` block of `src/global.css`; there is no `tailwind.config.js` (the project moved off NativeWind — see `src/components/ui/decisions.md`).
 - **Internationalization** — all user-facing strings live in `src/translations/en.json` (and other locale files). Never inline text in components.
 
 ## Rationale
-NativeWind ensures consistent design system usage and enables theming. Centralized translations enable multi-language support and prevent string duplication.
+Uniwind ensures consistent design system usage and enables theming. Centralized translations enable multi-language support and prevent string duplication.
 
 ## Examples
 
 ### Good
 ```tsx
-// NativeWind classes
+// Tailwind classes via uniwind
 <View className="flex-1 bg-background p-4">
   <Text className="text-lg font-semibold text-primary">{t('welcome')}</Text>
 </View>

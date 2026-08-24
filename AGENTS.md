@@ -5,8 +5,9 @@ TypeScript strict. Small, reviewable diffs. Match surrounding code.
 
 ## Where things live
 
-src/app/          Expo Router. Routing ONLY — every file is a re-export.
-                  Has decisions.md (navigator, guards, groups), no spec.md.
+src/app/          Expo Router. Leaf routes are re-exports; the two
+                  _layout.tsx files own the navigator and the guard.
+                  Has spec.md (route inventory) and decisions.md.
 src/features/     Vertical slices. One folder per capability.
 src/components/ui Design system primitives.
 src/lib/          Cross-cutting infra: api, auth, i18n, hooks, test-utils.
@@ -19,6 +20,7 @@ __tests__/        One per directory that has something to test.
 
 | If the task touches…                    | Open first                                    |
 |-----------------------------------------|-----------------------------------------------|
+| how the app fits together (new here?)   | ARCHITECTURE.md                               |
 | a feature                               | src/features/<f>/spec.md  then  decisions.md |
 | creating a new feature                  | .templates/spec.md → src/features/<f>/spec.md |
 | modifying feature behavior              | src/features/<f>/spec.md  then  decisions.md |
@@ -73,10 +75,14 @@ fix the spec in the same change.
   describe block names one module, the test belongs in that module's directory.
 - Render components with `setup` (userEvent + providers) or `render` from
   lib/test-utils, not RNTL's bare `render`.
-- Server state → React Query. Client state → Zustand. Never the same data in both.
+- Server state → React Query. Client state → Zustand. Never the same data in
+  both. No Zustand store exists yet — that half is the shape to follow when one
+  is needed, not a description of the code. Durable client state (theme,
+  first-run) goes to MMKV via lib/hooks.
 - All strings → src/translations/en.json. Never inline user-facing text.
 - Import with @/ absolute paths. No barrel files except components/ui.
-- Styling via NativeWind classes and theme tokens. No hex values, no magic spacing.
+- Styling via Tailwind classes (uniwind) and theme tokens from src/global.css.
+  No hex values, no magic spacing. There is no tailwind.config.js.
 - Use `Text` from components/ui, never React Native's `Text`.
 
 ## Don't
@@ -95,7 +101,7 @@ fix the spec in the same change.
 ## Ask first
 
 - Adding a native module (requires a new dev client build — say so explicitly)
-- Changes to app.config.ts, eas.json, or env.js
+- Changes to app.config.ts, eas.json, or env.ts
 - Adding any dependency
 - Deleting a feature folder (its spec.md, decisions.md, and __tests__/ go with it)
 
@@ -112,9 +118,13 @@ fix the spec in the same change.
 
 ## Detail (load on demand)
 
+- ARCHITECTURE.md     — **start here.** How the app is put together: slices,
+  runtime stack, provider tree, data flow, the spec system, and the deviations
+  from this guide that are real today. It links out rather than restating.
 - agents/rules/       — engineering rules, one file per topic
 - agents/commands.md  — full command reference
-- agents/knowledge-base.md — product domain and business rules
+- agents/knowledge-base.md — product domain and business rules (nearly empty:
+  this is a template, not a product yet)
 - README.md "Running the app" — dev build, prebuild, environments.
   This app cannot run in Expo Go; `pnpm start` alone is not enough on a
   fresh clone.

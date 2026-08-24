@@ -2,11 +2,11 @@
 /**
  * Spec drift check.
  *
- * Every module under src/features/<name>/, src/lib/<name>/ and the
- * src/components/ui/ design system must carry a spec.md AND a decisions.md.
- * src/app/ is the one decisions-only module: routes are re-exports, so their
- * behavior belongs to the feature's spec, but routing structure and guard
- * ordering are real decisions and go in src/app/decisions.md.
+ * Every module under src/features/<name>/, src/lib/<name>/, the
+ * src/components/ui/ design system and src/app/ must carry a spec.md AND a
+ * decisions.md. src/app/spec.md is the route inventory — which URLs exist and
+ * which feature screen each one renders — not a copy of the feature specs,
+ * which stay the source of truth for screen behavior.
  * scripts/spec-modules.js owns that map; this script only applies it.
  *
  * This script looks at what changed and fails when a changed module either
