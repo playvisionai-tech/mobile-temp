@@ -6,7 +6,10 @@ Displays a list of posts with infinite scroll. Users can add new posts via a mod
 ## Behavior
 - Feed screen fetches posts via React Query using `src/lib/api/client.tsx`.
 - Infinite scroll loads more pages on reaching end of list.
-- Add post button opens a modal (`add-post.tsx`) with form validation via React Hook Form + Zod.
+- The screen draws its own header row: the title `feed.title` and a "Create"
+  link (`feed.create`, testID `create-post-link`) to `/feed/add-post`. The
+  header lives here because the native tab bar has no header slot.
+- Add post opens `add-post.tsx` with form validation via TanStack Form + Zod.
 - On successful post creation, React Query cache is invalidated to refetch feed.
 
 ## Entry points

@@ -13,7 +13,7 @@ files own the navigator structure and the auth/onboarding guard.
 | URL | File | Renders |
 |---|---|---|
 | — | `_layout.tsx` | Root `Stack` + provider tree (owns behavior) |
-| — | `(app)/_layout.tsx` | `Tabs` + route guard (owns behavior) |
+| — | `(app)/_layout.tsx` | Native bottom tabs + route guard (owns behavior) |
 | `/` | `(app)/index.tsx` | `FeedScreen` from `@/features/feed/feed-screen` |
 | `/style` | `(app)/style.tsx` | `StyleScreen` from `@/features/style-demo/style-screen` |
 | `/settings` | `(app)/settings.tsx` | `SettingsScreen` from `@/features/settings/settings-screen` |
@@ -39,11 +39,18 @@ files own the navigator structure and the auth/onboarding guard.
   `!isSignedIn` → `/login`. Returning `null` while Clerk restores the session
   from the token cache is what stops an already-signed-in user being bounced to
   `/login`.
+- The tab bar is native: a SwiftUI `TabView` on iOS and a Material
+  `BottomNavigationView` on Android, from `react-native-bottom-tabs` via
+  `withLayoutContext`. It is not the JS tab bar `expo-router` ships.
 - Three tabs — Feed, Style, Settings — each with a `tabBarButtonTestID`
   (`feed-tab`, `style-tab`, `settings-tab`). `.maestro/app/tabs.yaml` selects
   tabs by those IDs, so renaming one breaks E2E.
-- The Feed tab sets `headerRight` to a `Link` to `/feed/add-post`. This is the
-  only screen-level UI defined in this module.
+- Tab icons come from `getTabIcon()` in `@/components/ui/tab-icons`, not from
+  the SVG components in `components/ui/icons/`. A native tab bar cannot render
+  a React element.
+- **This module defines no screen-level UI.** The native navigator has no
+  header slot, so the "Create" link that used to sit in the Feed tab's
+  `headerRight` now lives inside `FeedScreen`.
 
 ## Provider tree
 
