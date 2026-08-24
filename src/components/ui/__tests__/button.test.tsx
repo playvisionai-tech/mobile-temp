@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { Text } from 'react-native';
+import { ActivityIndicator, Text } from 'react-native';
 
 import { cleanup, render, screen, setup } from '@/lib/test-utils';
 
-import { Button } from './button';
+import { Button } from '../button';
 
 afterEach(cleanup);
 
@@ -29,6 +29,13 @@ describe('button component ', () => {
     render(<Button testID="button" loading={true} />);
     expect(screen.getByTestId('button')).toBeOnTheScreen();
     expect(screen.getByTestId('button-activity-indicator')).toBeOnTheScreen();
+  });
+  it('renders content without requiring a test identifier', () => {
+    const { rerender } = render(<Button label="Continue" />);
+    expect(screen.getByText('Continue')).toBeOnTheScreen();
+
+    rerender(<Button loading />);
+    expect(screen.UNSAFE_getByType(ActivityIndicator)).toBeTruthy();
   });
   it('should call onClick handler when clicked', async () => {
     const onClick = jest.fn();

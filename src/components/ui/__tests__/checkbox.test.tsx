@@ -3,13 +3,57 @@ import * as React from 'react';
 
 import { cleanup, screen, setup } from '@/lib/test-utils';
 
-import { Checkbox, Radio, Switch } from './checkbox';
+import { Checkbox, Radio, Switch } from '../checkbox';
 
 import 'react-native';
 
 afterEach(cleanup);
 
 describe('checkbox, Radio & Switch components ', () => {
+  it('supports composing control roots, icons, and labels', () => {
+    const onChange = jest.fn();
+    setup(
+      <>
+        <Checkbox.Root onChange={onChange} accessibilityLabel="checkbox root">
+          <Checkbox.Icon checked={false} />
+          <Checkbox.Label text="Checkbox label" />
+        </Checkbox.Root>
+        <Radio.Root onChange={onChange} accessibilityLabel="radio root">
+          <Radio.Icon checked={false} />
+          <Radio.Label text="Radio label" />
+        </Radio.Root>
+        <Switch.Root onChange={onChange} accessibilityLabel="switch root">
+          <Switch.Icon checked={false} />
+          <Switch.Label text="Switch label" />
+        </Switch.Root>
+      </>,
+    );
+
+    expect(screen.getByText('Checkbox label')).toBeOnTheScreen();
+    expect(screen.getByText('Radio label')).toBeOnTheScreen();
+    expect(screen.getByText('Switch label')).toBeOnTheScreen();
+  });
+
+  it.each([
+    ['checkbox', Checkbox],
+    ['radio', Radio],
+    ['switch', Switch],
+  ] as const)('<%s /> reports false when a checked control is pressed', async (testID, Control) => {
+    const onChange = jest.fn();
+    const { user } = setup(
+      <Control
+        checked
+        testID={testID}
+        onChange={onChange}
+        accessibilityLabel={testID}
+      />,
+    );
+
+    expect(screen.getByTestId(testID)).toBeChecked();
+    await user.press(screen.getByTestId(testID));
+    expect(onChange).toHaveBeenCalledWith(false);
+  });
+
   it('<Checkbox /> renders correctly and call on change on Press', async () => {
     const mockOnChange = jest.fn(checked => checked);
     const { user } = setup(

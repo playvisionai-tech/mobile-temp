@@ -1,3 +1,5 @@
+import type { getTabIcon as GetTabIcon } from '../tab-icons';
+
 import { Platform } from 'react-native';
 
 // The icon pack is a native module: under Jest there is no TurboModule to call,
@@ -23,7 +25,7 @@ jest.mock('@react-native-vector-icons/material-design-icons', () => ({
 function loadFresh() {
   // getTabIcon memoizes per module instance, so each platform case needs its
   // own copy of the module rather than a shared one.
-  let mod: typeof import('../tab-icons') | undefined;
+  let mod: { getTabIcon: typeof GetTabIcon } | undefined;
   jest.isolateModules(() => {
     mod = require('../tab-icons');
   });

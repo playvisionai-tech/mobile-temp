@@ -1,4 +1,4 @@
-import * as React from 'react';
+import type * as React from 'react';
 
 import { cleanup, render, screen } from '@/lib/test-utils';
 
@@ -8,13 +8,14 @@ import 'react-native';
 
 // The screen's own header is what this file covers, so the query is stubbed to
 // a settled empty result rather than exercising the network.
-const mockUsePosts = jest.fn(() => ({
+const mockUsePosts: jest.Mock = jest.fn(() => ({
   data: [],
   isPending: false,
   isError: false,
 }));
 
 jest.mock('../api', () => ({
+  // eslint-disable-next-line react/no-unnecessary-use-prefix
   usePosts: () => mockUsePosts(),
 }));
 
@@ -31,10 +32,30 @@ jest.mock('expo-router', () => ({
 // Remove both once the upstream jestSetup matches the installed version.
 jest.mock('@shopify/flash-list/jestSetup', () => ({}));
 
-jest.mock('@shopify/flash-list', () => ({
-  FlashList: ({ ListEmptyComponent }: { ListEmptyComponent?: React.ReactNode }) =>
-    ListEmptyComponent ?? null,
-}));
+jest.mock('@shopify/flash-list', () => {
+  const React = require('react');
+  return {
+    FlashList: ({
+      data,
+      keyExtractor,
+      ListEmptyComponent,
+      renderItem,
+    }: {
+      data?: Array<{ id: number; userId: number; title: string; body: string }>;
+      keyExtractor: (item: unknown, index: number) => string;
+      ListEmptyComponent?: React.ReactNode;
+      renderItem: (args: { item: { id: number; userId: number; title: string; body: string } }) => React.ReactNode;
+    }) => {
+      if (!data?.length)
+        return ListEmptyComponent ?? null;
+      return data.map((item, index) => (
+        <React.Fragment key={keyExtractor(item, index)}>
+          {renderItem({ item })}
+        </React.Fragment>
+      ));
+    },
+  };
+});
 
 afterEach(cleanup);
 
@@ -50,6 +71,19 @@ describe('feedScreen header', () => {
     render(<FeedScreen />);
 
     expect(screen.getByText('Create')).toBeOnTheScreen();
+  });
+
+  it('renders posts returned by the feed', () => {
+    mockUsePosts.mockReturnValueOnce({
+      data: [{ id: 3, userId: 1, title: 'Third post', body: 'Its body' }],
+      isPending: false,
+      isError: false,
+    });
+
+    render(<FeedScreen />);
+
+    expect(screen.getByText('Third post')).toBeOnTheScreen();
+    expect(screen.getByText('Its body')).toBeOnTheScreen();
   });
 
   it('renders no header on the error branch', () => {

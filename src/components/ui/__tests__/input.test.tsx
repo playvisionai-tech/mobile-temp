@@ -3,7 +3,7 @@ import { I18nManager } from 'react-native';
 
 import { cleanup, render, screen, setup } from '@/lib/test-utils';
 
-import { Input } from './input';
+import { Input } from '../input';
 
 afterEach(cleanup);
 
@@ -50,6 +50,12 @@ describe('input component ', () => {
     expect(screen.getByTestId('input-error')).toHaveTextContent(
       'This is an error message',
     );
+  });
+  it('renders label and error copy without requiring a test identifier', () => {
+    render(<Input label="Email" error="Email is required" />);
+
+    expect(screen.getByText('Email')).toBeOnTheScreen();
+    expect(screen.getByText('Email is required')).toBeOnTheScreen();
   });
   it('should render the label, error message & placeholder correctly ', () => {
     render(
