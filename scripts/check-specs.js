@@ -30,6 +30,7 @@ const path = require('node:path');
 const {
   getModuleDir,
   isModuleDoc,
+  isTestFile,
   requiredDocs,
   SPEC_FILE,
 } = require('./spec-modules.js');
@@ -128,7 +129,10 @@ function groupByModule(files) {
     if (isModuleDoc(file)) {
       entry.changedDocs.add(path.posix.basename(file.replaceAll('\\', '/')));
     }
-    else {
+    else if (!isTestFile(file)) {
+      // A test changes no observable behavior, so it does not trigger the
+      // freshness rule. It still counts the module as changed for the
+      // "spec.md and decisions.md exist" check above.
       entry.codeChanged = true;
     }
   }

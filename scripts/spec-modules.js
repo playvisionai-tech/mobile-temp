@@ -74,10 +74,27 @@ function isModuleDoc(file) {
   return name === SPEC_FILE || name === DECISIONS_FILE;
 }
 
+/**
+ * Is this a test rather than the code under test?
+ *
+ * The drift rule asks for a spec rewrite when a module's code changes. Adding
+ * or fixing a test changes no observable behavior, so demanding a spec edit for
+ * it produces exactly the padding AGENTS.md tells you not to write. Tests still
+ * count for the "module exists" check — only the freshness rule skips them.
+ *
+ * Covers both layouts in the repo: `__tests__/` folders (the documented
+ * convention) and the colocated `*.test.tsx` files in components/ui.
+ */
+function isTestFile(file) {
+  const p = file.replaceAll('\\', '/');
+  return p.includes('/__tests__/') || /\.(?:test|spec)\.[jt]sx?$/.test(p);
+}
+
 module.exports = {
   DECISIONS_FILE,
   getModuleDir,
   isModuleDoc,
+  isTestFile,
   MODULE_PARENTS,
   requiredDocs,
   ROUTING_MODULE,
