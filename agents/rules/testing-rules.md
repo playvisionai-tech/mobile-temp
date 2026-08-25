@@ -2,12 +2,12 @@
 
 ## Rule
 - **Test placement** — every directory with testable behavior gets a flat `__tests__/` folder. Tests for a file live next to it: `<dir>/__tests__/<file>.test.tsx`.
-- **Root `__tests__/`** — the sole exception, holds only whole-app smoke, cross-feature, and contract tests.
-- **Maestro E2E** — flows live in `.maestro/flows/`; each flow corresponds to a user journey that may span features.
+- **No root `__tests__/`** — there is no exception to the placement rule. `src/app/` is a module like any other and its tests live in `src/app/__tests__/`.
+- **Maestro E2E** — flows live in `.maestro/`, grouped by user journey (`auth/`, `app/`), with reusable steps in `utils/`. A flow corresponds to a user journey that may span features; whole-app and cross-feature coverage belongs here, not in a unit test.
 - **Test helpers** — shared fixtures and `renderWithProviders` live in `src/lib/test-utils.tsx`, not in `__tests__/`.
 
 ## Rationale
-Colocated tests move with their code, preventing drift. Flat `__tests__/` avoids parallel directory trees. Root `__tests__/` is explicitly scoped to whole-app concerns. Maestro flows follow user journeys, not feature boundaries.
+Colocated tests move with their code, preventing drift. Flat `__tests__/` avoids parallel directory trees. A root `__tests__/` would have no code to sit beside, so cross-cutting coverage goes to Maestro instead. Maestro flows follow user journeys, not feature boundaries.
 
 ## Examples
 
@@ -24,7 +24,7 @@ src/features/auth/
 ```
 
 ```yaml
-# .maestro/flows/auth/login.yaml
+# .maestro/auth/login.yaml
 appId: com.obytes.development
 ---
 - tapOn: "Email"

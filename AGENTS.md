@@ -13,7 +13,7 @@ src/components/ui Design system primitives.
 src/lib/          Cross-cutting infra: api, auth, i18n, hooks, test-utils.
 src/translations/ All user-facing strings.
 __tests__/        One per directory that has something to test.
-                  The ROOT one is the exception: whole-app tests only.
+                  There is no root one.
 .maestro/         E2E flows, by user journey.
 
 ## Read before you write  ← do this first, every task
@@ -69,11 +69,12 @@ fix the spec in the same change.
 - **Keep every `__tests__/` flat.** It covers only its immediate parent
   directory. Never put a subdirectory inside it — a file in `components/`
   is tested from `components/__tests__/`, not from the parent's.
-- Directories with nothing to test — src/app/, translations/, types/ — get
-  no `__tests__/`. Never create an empty one to satisfy the pattern.
-- The ROOT `__tests__/` is the one exception to the directory rule, and holds
-  whole-app tests only: smoke, cross-feature integration, contracts. If your
-  describe block names one module, the test belongs in that module's directory.
+- Directories with nothing to test — src/translations/ — get no `__tests__/`.
+  Never create an empty one to satisfy the pattern.
+- **There is no root `__tests__/`, and there is no exception to the directory
+  rule.** Every test sits beside the file it covers, src/app/ included — it is
+  a module like any other. Something genuinely cross-cutting, that belongs to
+  no single directory, is a Maestro E2E flow in `.maestro/`, not a unit test.
 - Render components with `setup` (userEvent + providers) or `render` from
   lib/test-utils, not RNTL's bare `render`.
 - Server state → React Query. Never copy server data into a store.
