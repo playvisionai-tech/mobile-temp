@@ -76,10 +76,17 @@ fix the spec in the same change.
   describe block names one module, the test belongs in that module's directory.
 - Render components with `setup` (userEvent + providers) or `render` from
   lib/test-utils, not RNTL's bare `render`.
-- Server state → React Query. Client state → Zustand. Never the same data in
-  both. No Zustand store exists yet — that half is the shape to follow when one
-  is needed, not a description of the code. Durable client state (theme,
-  first-run) goes to MMKV via lib/hooks.
+- Server state → React Query. Never copy server data into a store.
+- Client state belongs to the feature that owns it. A feature's Zustand store
+  lives in its own slice — `src/features/<feature>/store.ts`. There is no
+  global store, and a feature never imports another feature's store.
+- **Create a store only when the feature already has client state to hold**:
+  state that outlives a render, is read or written by more than one component
+  in the slice, and is not server data. Short of that, `useState` is enough.
+  Most features need no store. An empty or just-in-case store is wrong —
+  never add one to a new feature to complete the shape.
+- Durable client state (theme, first-run) goes to MMKV via lib/hooks.
+- No Zustand store exists yet — the above is where the first one goes.
 - All strings → src/translations/en.json. Never inline user-facing text.
 - Import with @/ absolute paths. No barrel files except components/ui.
 - Styling via Tailwind classes (uniwind) and theme tokens from src/global.css.
