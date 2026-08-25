@@ -115,5 +115,13 @@ cannot run in Expo Go. You need a development build:
   pnpm prebuild:development
   pnpm ios            # or: pnpm android
 
+Two credentials ship as PLACEHOLDERS and must be replaced before anything
+talks to a real service:
+
+  .env                EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY — sign-in fails without it
+  firebase/<env>/     GoogleService-Info.plist + google-services.json — Analytics,
+                      Crashlytics and Remote Config report nothing until replaced,
+                      silently. See firebase/README.md.
+
 See AGENTS.md for the codebase guide and agents/commands.md for all commands.
 NEXT

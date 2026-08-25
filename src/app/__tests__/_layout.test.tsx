@@ -2,6 +2,8 @@ import * as SplashScreen from 'expo-splash-screen';
 import * as React from 'react';
 
 import { useThemeConfig } from '@/components/ui/use-theme-config';
+import { useScreenTracking } from '@/lib/analytics';
+import { initializeFeatureFlags } from '@/lib/feature-flags';
 import { loadSelectedTheme } from '@/lib/hooks/use-selected-theme';
 import { fireEvent, render, screen } from '@/lib/test-utils';
 
@@ -70,6 +72,16 @@ jest.mock('@/lib/hooks/use-selected-theme', () => ({
   loadSelectedTheme: jest.fn(),
 }));
 
+// Both telemetry modules are covered by their own tests. Here the observable
+// behavior is only that the root layout starts them.
+jest.mock('@/lib/analytics', () => ({
+  useScreenTracking: jest.fn(),
+}));
+
+jest.mock('@/lib/feature-flags', () => ({
+  initializeFeatureFlags: jest.fn(() => Promise.resolve()),
+}));
+
 describe('root layout', () => {
   it('initializes startup services and declares the root stack', () => {
     render(<RootLayout />);
@@ -80,6 +92,14 @@ describe('root layout', () => {
     expect(screen.getByTestId('stack-(app)')).toBeOnTheScreen();
     expect(screen.getByTestId('stack-onboarding')).toBeOnTheScreen();
     expect(screen.getByTestId('stack-login')).toBeOnTheScreen();
+  });
+
+  it('starts feature flags at module scope and tracks screens from the tree', () => {
+    render(<RootLayout />);
+
+    // Module scope: fired on import, before anything rendered.
+    expect(initializeFeatureFlags).toHaveBeenCalled();
+    expect(useScreenTracking).toHaveBeenCalled();
   });
 
   it('hides the splash only after the first root layout', () => {

@@ -18,7 +18,7 @@ screens, its components, its data hooks and its docs, in one folder.
 | `src/app/` | Expo Router's file tree. Leaf routes are one-line re-exports; the two `_layout.tsx` files own the navigator and the route guard. |
 | `src/features/<f>/` | One folder per capability: `auth`, `feed`, `onboarding`, `settings`, `style-demo`. Screens, feature-local `components/`, `api.ts`, tests, `spec.md`, `decisions.md`. |
 | `src/components/ui/` | The design system. One shared inventory, one barrel (`index.tsx`) — the only barrel file the project allows. |
-| `src/lib/` | Cross-cutting infra, one module per subdirectory: `api`, `auth`, `hooks`, `i18n`, `storage`, `utils`. `test-utils.tsx` is the one loose file left at the top and belongs to no module. |
+| `src/lib/` | Cross-cutting infra, one module per subdirectory: `analytics`, `api`, `auth`, `crash-reporting`, `feature-flags`, `hooks`, `i18n`, `storage`, `utils`. `test-utils.tsx` is the one loose file left at the top and belongs to no module. |
 | `src/translations/` | `en.json` and `ar.json`. All user-facing copy. |
 | `.maestro/` | E2E flows grouped by user journey (`auth/`, `app/`), with reusable steps in `utils/`. |
 
@@ -44,6 +44,9 @@ Verified against `package.json` and the files that wire each one up.
 | Lists | `@shopify/flash-list` 2 | `src/components/ui/list.tsx`, `src/features/feed/feed-screen.tsx` |
 | i18n | `i18next` + `react-i18next` + `expo-localization` | `src/lib/i18n/` |
 | Forms | `@tanstack/react-form` + `zod` | feature screens, `src/components/ui/form-utils` |
+| Analytics | `@react-native-firebase/analytics` 26 | `src/lib/analytics/`, screen tracking mounted in `src/app/_layout.tsx` |
+| Crash reporting | `@react-native-firebase/crashlytics` 26 | `src/lib/crash-reporting/` |
+| Feature flags | `@react-native-firebase/remote-config` 26 | `src/lib/feature-flags/`, initialized in `src/app/_layout.tsx` |
 | Config | `zod` schema in `env.ts` | `app.config.ts`, imported as `env` |
 
 The app depends on native modules (Clerk, SecureStore, MMKV, Reanimated,
@@ -162,7 +165,10 @@ Per-module specs, all of which exist today:
 | Onboarding | [`src/features/onboarding/spec.md`](src/features/onboarding/spec.md) · [decisions](src/features/onboarding/decisions.md) |
 | Settings | [`src/features/settings/spec.md`](src/features/settings/spec.md) · [decisions](src/features/settings/decisions.md) |
 | Style demo | [`src/features/style-demo/spec.md`](src/features/style-demo/spec.md) · [decisions](src/features/style-demo/decisions.md) |
+| Analytics | [`src/lib/analytics/spec.md`](src/lib/analytics/spec.md) · [decisions](src/lib/analytics/decisions.md) |
 | API client | [`src/lib/api/spec.md`](src/lib/api/spec.md) · [decisions](src/lib/api/decisions.md) |
+| Crash reporting | [`src/lib/crash-reporting/spec.md`](src/lib/crash-reporting/spec.md) · [decisions](src/lib/crash-reporting/decisions.md) |
+| Feature flags | [`src/lib/feature-flags/spec.md`](src/lib/feature-flags/spec.md) · [decisions](src/lib/feature-flags/decisions.md) |
 | Auth library (unused) | [`src/lib/auth/spec.md`](src/lib/auth/spec.md) · [decisions](src/lib/auth/decisions.md) |
 | Hooks | [`src/lib/hooks/spec.md`](src/lib/hooks/spec.md) · [decisions](src/lib/hooks/decisions.md) |
 | i18n | [`src/lib/i18n/spec.md`](src/lib/i18n/spec.md) · [decisions](src/lib/i18n/decisions.md) |
@@ -190,6 +196,13 @@ Stated here rather than hidden, so nobody rediscovers them as surprises.
   coverage is not there yet. The absence of a root `__tests__/` is not part of
   this gap — that is the rule: every test sits beside the file it covers, and
   cross-cutting coverage is a Maestro flow.
+- **The Firebase config files in `firebase/` are placeholders.** They are
+  structurally valid so every `pnpm prebuild:*` succeeds, but every key is fake,
+  so nothing reports to Firebase until they are replaced with real downloads
+  from the console. See [`firebase/README.md`](firebase/README.md).
+- **Nothing sets the telemetry user id yet.** `setCrashUser` / `setAnalyticsUser`
+  exist and are tested, but no sign-in or sign-out path calls them, so events and
+  crashes are anonymous. Wiring them is a change to `src/features/auth/`.
 - **`nativewind-env.d.ts` is still referenced from `tsconfig.json`** even though
   styling moved to uniwind. Harmless, and not yet cleaned up.
 - **There is no single CI pipeline.** The workflows in `.github/workflows/` are

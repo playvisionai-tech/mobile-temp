@@ -112,6 +112,31 @@ and put it in `.env`.
   scratch. Deleting `ios/` and `android/` is equivalent since they are generated.
 - **Check your setup:** `pnpm doctor` runs expo-doctor against the project.
 
+## 🔥 Firebase
+
+Analytics, Crashlytics and Remote Config run on React Native Firebase (native
+modules — this app already cannot run in Expo Go).
+
+The config files in `firebase/<env>/` are **placeholders**. Replace them with
+real downloads from the Firebase console before expecting any data:
+
+1. Create (or open) a Firebase project. Production should be its own project so
+   development traffic cannot contaminate it.
+2. Register an iOS app and an Android app per environment, using the bundle
+   ids in `env.ts` — `com.obytes.development`, `com.obytes.preview`,
+   `com.obytes`.
+3. Download each `GoogleService-Info.plist` / `google-services.json` into the
+   matching `firebase/<env>/` directory, replacing the placeholder.
+4. `pnpm prebuild:development --clean && pnpm ios` (or `pnpm android`).
+
+Collection defaults live in the root `firebase.json`; iOS linkage requirements
+are explained in [`firebase/README.md`](firebase/README.md). Application code
+never imports `@react-native-firebase/*` directly — it goes through
+`@/lib/analytics`, `@/lib/crash-reporting` and `@/lib/feature-flags`.
+
+A **fatal** crash cannot be verified in a dev-client build: Expo Dev Client's
+error overlay intercepts it. Test fatal delivery in a preview/release build.
+
 ## 🤖 Agent tooling (MCP)
 
 This repo ships [Argent](https://github.com/software-mansion/argent) by Software
