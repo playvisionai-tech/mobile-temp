@@ -184,11 +184,12 @@ Stated here rather than hidden, so nobody rediscovers them as surprises.
   [Data flow](#data-flow).
 - **`src/lib/auth/` is dead code.** A pre-Clerk MMKV token store that nothing
   imports; its own spec says so.
-- **Tests are thin.** Only `src/features/auth/` and
-  `src/features/auth/components/` have a `__tests__/` folder, and there is no
-  root `__tests__/`. The placement convention in
+- **Tests are thin.** Several directories that hold behavior still have no
+  `__tests__/` folder. The placement convention in
   [`agents/rules/testing-rules.md`](agents/rules/testing-rules.md) is correct;
-  coverage is not there yet.
+  coverage is not there yet. The absence of a root `__tests__/` is not part of
+  this gap — that is the rule: every test sits beside the file it covers, and
+  cross-cutting coverage is a Maestro flow.
 - **`nativewind-env.d.ts` is still referenced from `tsconfig.json`** even though
   styling moved to uniwind. Harmless, and not yet cleaned up.
 - **There is no single CI pipeline.** The workflows in `.github/workflows/` are
