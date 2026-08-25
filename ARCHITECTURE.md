@@ -18,7 +18,7 @@ screens, its components, its data hooks and its docs, in one folder.
 | `src/app/` | Expo Router's file tree. Leaf routes are one-line re-exports; the two `_layout.tsx` files own the navigator and the route guard. |
 | `src/features/<f>/` | One folder per capability: `auth`, `feed`, `onboarding`, `settings`, `style-demo`. Screens, feature-local `components/`, `api.ts`, tests, `spec.md`, `decisions.md`. |
 | `src/components/ui/` | The design system. One shared inventory, one barrel (`index.tsx`) — the only barrel file the project allows. |
-| `src/lib/` | Cross-cutting infra, one module per subdirectory: `api`, `auth`, `hooks`, `i18n`. Loose files at the top (`storage.tsx`, `test-utils.tsx`, `utils.ts`) belong to no module. |
+| `src/lib/` | Cross-cutting infra, one module per subdirectory: `api`, `auth`, `hooks`, `i18n`, `storage`, `utils`. `test-utils.tsx` is the one loose file left at the top and belongs to no module. |
 | `src/translations/` | `en.json` and `ar.json`. All user-facing copy. |
 | `.maestro/` | E2E flows grouped by user journey (`auth/`, `app/`), with reusable steps in `utils/`. |
 
@@ -38,7 +38,7 @@ Verified against `package.json` and the files that wire each one up.
 | Token persistence | `expo-secure-store` (via Clerk's `tokenCache`) | `src/app/_layout.tsx` |
 | Server state | `@tanstack/react-query` ^5 + `react-query-kit` | `src/lib/api/provider.tsx`, `src/features/feed/api.ts` |
 | HTTP | `axios` | `src/lib/api/client.tsx` (request + response interceptors) |
-| Client persistence | `react-native-mmkv` ~4 | `src/lib/storage.tsx`, `src/lib/hooks/` |
+| Client persistence | `react-native-mmkv` ~4 | `src/lib/storage/index.tsx`, `src/lib/hooks/` |
 | Styling | `uniwind` + Tailwind v4 | `src/global.css`, `metro.config.js` |
 | Animation | `react-native-reanimated` ~4, `react-native-worklets`, `moti` | `src/components/ui/` |
 | Lists | `@shopify/flash-list` 2 | `src/components/ui/list.tsx`, `src/features/feed/feed-screen.tsx` |
@@ -91,14 +91,14 @@ sign-in, session and sign-out; `tokenCache` from `@clerk/expo/token-cache`
 persists the session in `expo-secure-store`. Detail:
 [`src/features/auth/spec.md`](src/features/auth/spec.md).
 
-**Durable client state → MMKV.** `src/lib/storage.tsx` creates the instance;
+**Durable client state → MMKV.** `src/lib/storage/index.tsx` creates the instance;
 `src/lib/hooks/use-selected-theme.tsx` and `use-is-first-time.tsx` are the only
 consumers. MMKV is chosen because it reads synchronously, so the theme and the
 first-run flag are available before the first render. It holds **no tokens**.
 
 **Zustand is aspirational.** `AGENTS.md` and the rule files say "client state →
 Zustand". Today the package is a dependency and nothing uses it: the only
-reference in `src/` is a type-only import in `src/lib/utils.ts`, feeding a
+reference in `src/` is a type-only import in `src/lib/utils/index.ts`, feeding a
 `createSelectors` helper that has no store to select from. Treat the rule as
 the intended shape for the first store that needs it, not as a description of
 the code.
@@ -180,7 +180,7 @@ Stated here rather than hidden, so nobody rediscovers them as surprises.
   catch-all's param is also spelled `messing`, which reads like a typo for
   `missing`; renaming it changes a URL, so it has been left alone.
 - **Zustand is a dependency with no store**, and `createSelectors` in
-  `src/lib/utils.ts` is a helper with nothing to help. See
+  `src/lib/utils/index.ts` is a helper with nothing to help. See
   [Data flow](#data-flow).
 - **`src/lib/auth/` is dead code.** A pre-Clerk MMKV token store that nothing
   imports; its own spec says so.

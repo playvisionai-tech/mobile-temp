@@ -31,7 +31,7 @@ The loadable skills live in `.agents/skills/<name>/SKILL.md`: the `argent-*` set
 
 They are plain code paths, not tooling:
 
-- **Storage** – `react-native-mmkv` through `src/lib/storage.tsx`. No CLI, no
+- **Storage** – `react-native-mmkv` through `src/lib/storage/index.tsx`. No CLI, no
   inspect or clear helper; read and write it from the app.
 - **i18n** – `i18next` + `react-i18next`. Strings live in
   `src/translations/*.json`; `pnpm lint:translations` checks them. See

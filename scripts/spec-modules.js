@@ -32,7 +32,7 @@ const MODULE_PARENTS = ['src/features/', 'src/lib/'];
 /**
  * Map a repo-relative file path to the module directory that owns it.
  * Returns null when the file belongs to no module — notably for loose files
- * sitting directly in src/features/ or src/lib/ (e.g. src/lib/storage.tsx),
+ * sitting directly in src/features/ or src/lib/ (e.g. src/lib/test-utils.tsx),
  * which are not modules of their own.
  */
 function getModuleDir(file) {
