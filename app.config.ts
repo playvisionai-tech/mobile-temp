@@ -27,6 +27,17 @@ const appIconBadgeConfig: AppIconBadgeConfig = {
   ],
 };
 
+// `app` copies the per-environment GoogleService files into the native
+// projects; `analytics` and `crashlytics` add their own Podfile / Gradle mods;
+// remote-config ships no config plugin. Both iOS flags are load-bearing —
+// firebase/README.md explains the two `pod install` failures they fix.
+const firebasePlugins: ExpoConfig['plugins'] = [
+  ['@react-native-firebase/app', { ios: { disableSPM: true } }],
+  '@react-native-firebase/analytics',
+  '@react-native-firebase/crashlytics',
+  ['expo-build-properties', { ios: { useFrameworks: 'static' } }],
+];
+
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
   name: Env.EXPO_PUBLIC_NAME,
@@ -46,6 +57,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ios: {
     supportsTablet: true,
     bundleIdentifier: Env.EXPO_PUBLIC_BUNDLE_ID,
+    googleServicesFile: Env.APP_FIREBASE_IOS_CONFIG,
     infoPlist: {
       ITSAppUsesNonExemptEncryption: false,
     },
@@ -59,6 +71,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       backgroundColor: '#2E3C4B',
     },
     package: Env.EXPO_PUBLIC_PACKAGE,
+    googleServicesFile: Env.APP_FIREBASE_ANDROID_CONFIG,
   },
   web: {
     favicon: './assets/favicon.png',
@@ -121,6 +134,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     // Registers the Material Design Icons font. The native tab bar rasterizes
     // glyphs from it on Android — see components/ui/tab-icons.tsx.
     '@react-native-vector-icons/material-design-icons',
+    ...firebasePlugins,
     ['app-icon-badge', appIconBadgeConfig],
     ['react-native-edge-to-edge'],
   ],

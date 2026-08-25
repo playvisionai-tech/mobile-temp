@@ -34,6 +34,14 @@ files own the navigator structure and the auth/onboarding guard.
   `GestureHandlerRootView`, guarded by a ref so it fires once.
 - `loadSelectedTheme()` runs at module scope, before first render, so the app
   does not flash the wrong theme.
+- `initializeFeatureFlags()` also runs at module scope, fire-and-forget. It
+  activates the Remote Config values fetched on the *previous* launch and starts
+  a fetch that applies to the *next* one, so flags never change mid-session.
+  Reads fall back to the in-app defaults until it settles, and it never rejects.
+- `RootLayout` calls `useScreenTracking()` from `@/lib/analytics`, which logs a
+  `screen_view` on every router path change. Native automatic screen reporting
+  is disabled in the root `firebase.json`, so this hook is the only source of
+  screen analytics.
 - The `(app)` guard runs in a fixed order, and the order is load-bearing:
   first-run → `/onboarding`; then `!isLoaded` → render nothing; then
   `!isSignedIn` → `/login`. Returning `null` while Clerk restores the session

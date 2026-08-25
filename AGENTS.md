@@ -44,6 +44,17 @@ __tests__/        One per directory that has something to test.
 If a spec contradicts the code, the code is right and the spec is a bug —
 fix the spec in the same change.
 
+## Known-fake credentials — do not trust telemetry locally
+
+`firebase/<env>/GoogleService-Info.plist` and `google-services.json` are
+**placeholders with fabricated keys**, and `.env`'s
+`EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY` is a placeholder too. The app builds, boots
+and runs, but Analytics, Crashlytics and Remote Config **fail silently** —
+nothing reaches Firebase, no error is raised, and reads fall back to in-app
+defaults. Never report telemetry as "working" on the strength of a local run:
+`firebase/README.md` says what to replace. Clerk is louder — an invalid
+publishable key makes `ClerkProvider` throw at render.
+
 ## Do
 
 - **Every feature/lib/UI module with testable behavior MUST have `spec.md` and
