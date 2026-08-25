@@ -26,3 +26,8 @@ cli/test-project/
 
 # Editor/agent backup files
 *.bak
+
+# Local env files — .env.example is the tracked template
+.env
+.env.local
+.env.*.local
