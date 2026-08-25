@@ -33,6 +33,11 @@ Not in the barrel, import directly: `getFieldError` from
 `error` prop), the icon set in `@/components/ui/icons`, and
 `useThemeConfig` from `@/components/ui/use-theme-config`.
 
+The icon set is eight in-app SVG components: `ArrowRight`, `CaretDown`,
+`Github`, `Language`, `Rate`, `Share`, `Support`, `Website`. Tab bar icons are
+not among them — the native bar cannot render a React component, so it takes
+its icons from `getTabIcon` instead.
+
 ## Theme
 There is no `tailwind.config.js`. Colors, fonts, and semantic tokens are
 defined as CSS variables in the `@theme` block of `src/global.css`
