@@ -20,9 +20,9 @@ other component in the design system, and exports our `Image`.
 **Nothing else in `src/` imports `expo-image`.** One import site. Swapping the
 image library is a one-file change. This is the target.
 
-## `react-native-mmkv` → `src/lib/storage.tsx` — a deliberate partial
+## `react-native-mmkv` → `src/lib/storage/index.tsx` — a deliberate partial
 
-`storage.tsx` creates the MMKV instance once and exports it, plus
+`storage/index.tsx` creates the MMKV instance once and exports it, plus
 `getItem`/`setItem`/`removeItem` helpers.
 
 But three modules — `src/lib/hooks/use-is-first-time.tsx`,
