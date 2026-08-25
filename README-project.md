@@ -23,7 +23,13 @@ git clone https://github.com/user/repo-name
 cd ./repo-name
 
 pnpm install
+
+cp .env.example .env
 ```
+
+`.env` is not committed. Copy it from `.env.example` before the first build —
+`env.ts` validates the variables with Zod, and a prebuild fails without them.
+(`./setup.sh` does this step for you.)
 
 To run the app on ios
 

@@ -53,6 +53,10 @@ If you cloned this repository rather than generating a project from it:
 
 It is safe to re-run and never overwrites an existing `.env`.
 
+`.env` is not committed, so a fresh clone has none. `setup.sh` creates it;
+the manual equivalent is `cp .env.example .env`. Do it before the first
+prebuild — `env.ts` validates the variables with Zod and fails without them.
+
 ## ▶️ Running the app
 
 > **This app cannot run in Expo Go.** It depends on native modules (Clerk,
