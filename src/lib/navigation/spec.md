@@ -56,10 +56,35 @@ Three things therefore fail to compile in this file:
 are live assertions: an unused `@ts-expect-error` is itself a compile error, so
 if the registry ever stops catching one of them, `pnpm type-check` fails.
 
+## This depends on generated types, and CI generates them
+Everything above is only true when `.expo/types/router.d.ts` exists. That file
+is generated and gitignored, and it is what declaration-merges the real route
+union into `expo-router`. Without it `Href` falls back to its permissive default,
+`Route` degrades to `string`, and `StaticRoute` excludes nothing.
+
+`.github/workflows/type-check.yml` therefore regenerates it before running
+`tsc`, so the guarantee holds in CI and not just on a machine that has run the
+app. The three `@ts-expect-error` directives double as the check on that step:
+if typegen ever stops working, they go unused and the build fails loudly rather
+than passing while checking nothing.
+
+## What this covers that `typedRoutes` alone does not
+With the route types present, `tsc` already checks the **object** form of an
+`Href` everywhere in the app — both its pathname and its params. What it does
+not check is the **string** form: the generated union contains a `/${string}`
+member, so `<Link href="/nope-not-a-route">` compiles anywhere. The two
+mechanisms are complementary, and together they cover both forms:
+
+| Form | Checked by |
+|---|---|
+| `{ pathname, params }` | the generated types, everywhere |
+| `'/some/path'` | this registry, once, at its definition |
+
 ## Adding a route
 1. Add the file under `src/app/` and record it in `src/app/spec.md`.
-2. Run the app (or `npx expo customize tsconfig.json`) so Expo regenerates
-   `.expo/types/router.d.ts` — the new path is not in `Route` until it does.
+2. Run the app so Expo regenerates `.expo/types/router.d.ts` — the new path is
+   not in `Route` until it does. CI regenerates it on every run; a local
+   checkout does not, so a stale `.expo/` is a local-only failure mode.
 3. Add the key here and to the table above.
 
 Adding a key before step 2 fails type-check, which is the intended order.
