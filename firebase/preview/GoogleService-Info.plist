@@ -4,11 +4,17 @@
   PLACEHOLDER. Replace with the real GoogleService-Info.plist downloaded from
   the Firebase console for the iOS app whose bundle id is com.obytes.preview.
   Analytics, Crashlytics and Remote Config do not report until you do.
+
+  API_KEY is a fabricated value that merely satisfies Firebase's format
+  check (39 characters, leading 'A'). The check runs in FirebaseInstallations
+  at startup and raises an uncaught ObjC exception when it fails, which
+  aborts the app before any JS runs -- so a malformed placeholder here is a
+  launch crash, not silent no-op telemetry.
 -->
 <plist version="1.0">
 <dict>
 	<key>API_KEY</key>
-	<string>REPLACE_ME_WITH_REAL_IOS_API_KEY</string>
+	<string>AIzaSyDUMMY_REPLACE_ME_WITH_REAL_KEY_00</string>
 	<key>GCM_SENDER_ID</key>
 	<string>000000000000</string>
 	<key>PLIST_VERSION</key>
