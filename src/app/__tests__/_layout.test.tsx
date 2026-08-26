@@ -2,7 +2,8 @@ import * as SplashScreen from 'expo-splash-screen';
 import * as React from 'react';
 
 import { useThemeConfig } from '@/components/ui/use-theme-config';
-import { useScreenTracking } from '@/lib/analytics';
+import { setAnalyticsUser, useScreenTracking } from '@/lib/analytics';
+import { setCrashUser } from '@/lib/crash-reporting';
 import { initializeFeatureFlags } from '@/lib/feature-flags';
 import { loadSelectedTheme } from '@/lib/hooks/use-selected-theme';
 import { fireEvent, render, screen } from '@/lib/test-utils';
@@ -21,6 +22,11 @@ jest.mock('@clerk/expo/token-cache', () => ({ tokenCache: { cache: true } }));
 jest.mock('@clerk/expo', () => {
   return {
     ClerkProvider: ({ children }: { children: React.ReactNode }) => children,
+    useAuth: jest.fn(() => ({
+      isLoaded: true,
+      isSignedIn: true,
+      userId: 'user_2abcDEF',
+    })),
   };
 });
 
@@ -75,7 +81,12 @@ jest.mock('@/lib/hooks/use-selected-theme', () => ({
 // Both telemetry modules are covered by their own tests. Here the observable
 // behavior is only that the root layout starts them.
 jest.mock('@/lib/analytics', () => ({
+  setAnalyticsUser: jest.fn(),
   useScreenTracking: jest.fn(),
+}));
+
+jest.mock('@/lib/crash-reporting', () => ({
+  setCrashUser: jest.fn(),
 }));
 
 jest.mock('@/lib/feature-flags', () => ({
@@ -100,6 +111,13 @@ describe('root layout', () => {
     // Module scope: fired on import, before anything rendered.
     expect(initializeFeatureFlags).toHaveBeenCalled();
     expect(useScreenTracking).toHaveBeenCalled();
+  });
+
+  it('identifies the Clerk session to telemetry from inside the provider', () => {
+    render(<RootLayout />);
+
+    expect(setAnalyticsUser).toHaveBeenCalledWith('user_2abcDEF');
+    expect(setCrashUser).toHaveBeenCalledWith('user_2abcDEF');
   });
 
   it('hides the splash only after the first root layout', () => {

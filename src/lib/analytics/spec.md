@@ -91,6 +91,9 @@ someone's handle still passes. The registry is the real guarantee.
   `@/lib/analytics`.
 - **This module mounts nothing.** `useScreenTracking` is exported for the root
   layout (`src/app/_layout.tsx`) to call; the module does not wire itself in.
+- `setAnalyticsUser` is called from one place: `TelemetryIdentity` in
+  `src/features/auth/`, which passes Clerk's opaque `userId` and `null` on
+  sign-out. This module neither knows nor asks who the user is.
 
 ## Platform differences
 - None in this module. iOS and Android divergence is handled inside the Firebase

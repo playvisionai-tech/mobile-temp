@@ -49,6 +49,15 @@ and it is the one the type-checker guards.
   `screen_view` on every router path change. Native automatic screen reporting
   is disabled in the root `firebase.json`, so this hook is the only source of
   screen analytics.
+- `RootLayout` also mounts `<TelemetryIdentity />` from
+  `@/features/auth/telemetry-identity` as the first child of `ClerkProvider`.
+  It renders nothing; it sets the analytics and Crashlytics user id from Clerk's
+  session, so events and crashes carry the account that produced them. It sits
+  inside the provider because it reads `useAuth()`, and above `Providers` so it
+  follows the session for the whole tree — including the cold-start restore and
+  the API client's 401 sign-out, neither of which passes through `/login`. What
+  it sends is the auth feature's behavior, described in
+  `src/features/auth/spec.md`.
 - The `(app)` guard runs in a fixed order, and the order is load-bearing:
   first-run → `ROUTES.onboarding`; then `!isLoaded` → render nothing; then
   `!isSignedIn` → `ROUTES.login`. Returning `null` while Clerk restores the
@@ -82,7 +91,8 @@ Outermost to innermost, from `_layout.tsx`:
 
 `ClerkProvider` → `GestureHandlerRootView` → `KeyboardProvider` →
 `ThemeProvider` → `APIProvider` → `BottomSheetModalProvider` → routes, with
-`FlashMessage` mounted as a sibling of the routes.
+`FlashMessage` mounted as a sibling of the routes and `TelemetryIdentity` as a
+sibling of `GestureHandlerRootView`, directly under `ClerkProvider`.
 
 ## Known deviations from the guide
 

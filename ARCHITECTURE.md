@@ -59,6 +59,8 @@ From `src/app/_layout.tsx`, outermost to innermost:
 
 ```
 ClerkProvider
+├── TelemetryIdentity           (renders nothing; mirrors the Clerk session
+│                                into analytics + Crashlytics)
 └── GestureHandlerRootView      (also carries the `dark` class and onLayout)
     └── KeyboardProvider
         └── ThemeProvider       (@react-navigation/native, from useThemeConfig)
@@ -91,7 +93,10 @@ hand-rolled `fetch` anywhere. Detail: [`src/lib/api/spec.md`](src/lib/api/spec.m
 
 **Session state → Clerk.** There is no local auth store. Clerk owns
 sign-in, session and sign-out; `tokenCache` from `@clerk/expo/token-cache`
-persists the session in `expo-secure-store`. Detail:
+persists the session in `expo-secure-store`. The same session drives the
+telemetry identity: `TelemetryIdentity` in `src/features/auth/` watches
+`useAuth()` and passes Clerk's opaque `userId` — never an email or a name — to
+`setAnalyticsUser` and `setCrashUser`, clearing both on sign-out. Detail:
 [`src/features/auth/spec.md`](src/features/auth/spec.md).
 
 **Durable client state → MMKV.** `src/lib/storage/index.tsx` creates the instance;
@@ -200,9 +205,6 @@ Stated here rather than hidden, so nobody rediscovers them as surprises.
   structurally valid so every `pnpm prebuild:*` succeeds, but every key is fake,
   so nothing reports to Firebase until they are replaced with real downloads
   from the console. See [`firebase/README.md`](firebase/README.md).
-- **Nothing sets the telemetry user id yet.** `setCrashUser` / `setAnalyticsUser`
-  exist and are tested, but no sign-in or sign-out path calls them, so events and
-  crashes are anonymous. Wiring them is a change to `src/features/auth/`.
 - **There is no single CI pipeline.** The workflows in `.github/workflows/` are
   independent jobs that run in parallel. The ordered sequence
   (`lint → type-check → translations → test → check-specs`) exists only as the
