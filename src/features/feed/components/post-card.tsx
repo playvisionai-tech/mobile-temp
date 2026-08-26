@@ -4,6 +4,7 @@ import { Link } from 'expo-router';
 import * as React from 'react';
 
 import { Image, Pressable, Text, View } from '@/components/ui';
+import { ROUTES } from '@/lib/navigation';
 
 const images = [
   'https://images.unsplash.com/photo-1489749798305-4fea3ae63d43?auto=format&fit=crop&w=800&q=80',
@@ -17,7 +18,7 @@ type Props = Post;
 
 export function PostCard({ title, body, id }: Props) {
   return (
-    <Link href={`/feed/${id}`} asChild>
+    <Link href={ROUTES.post(id)} asChild>
       <Pressable>
         <View className="m-2 overflow-hidden rounded-xl border border-neutral-300 bg-white dark:bg-neutral-900">
           <Image

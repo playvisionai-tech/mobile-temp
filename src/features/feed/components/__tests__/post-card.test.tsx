@@ -7,8 +7,16 @@ jest.mock('expo-router', () => {
   const React = require('react');
   const { View } = require('react-native');
   return {
-    Link: ({ children, href }: { children: React.ReactNode; href: string }) => (
-      <View testID={`post-link-${href}`}>{children}</View>
+    Link: ({
+      children,
+      href,
+    }: {
+      children: React.ReactNode;
+      href: { pathname: string; params: { id: string | number } };
+    }) => (
+      <View testID={`post-link-${href.pathname}-${href.params.id}`}>
+        {children}
+      </View>
     ),
   };
 });
@@ -28,6 +36,6 @@ describe('post card', () => {
 
     expect(screen.getByText('A post title')).toBeOnTheScreen();
     expect(screen.getByText('A post summary')).toBeOnTheScreen();
-    expect(screen.getByTestId('post-link-/feed/4')).toBeOnTheScreen();
+    expect(screen.getByTestId('post-link-/feed/[id]-4')).toBeOnTheScreen();
   });
 });

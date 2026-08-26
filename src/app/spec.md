@@ -8,21 +8,28 @@ files own the navigator structure and the auth/onboarding guard.
 
 ## Route inventory
 
-`(app)` is a group, so it does not appear in the URL.
+`(app)` is a group, so it does not appear in the URL. The **Name** column is the
+key in `ROUTES` from `@/lib/navigation` — the registry every call site
+navigates through instead of writing the URL out. A route with no name is one
+nothing navigates to by path.
 
-| URL | File | Renders |
-|---|---|---|
-| — | `_layout.tsx` | Root `Stack` + provider tree (owns behavior) |
-| — | `(app)/_layout.tsx` | Native bottom tabs + route guard (owns behavior) |
-| `/` | `(app)/index.tsx` | `FeedScreen` from `@/features/feed/feed-screen` |
-| `/style` | `(app)/style.tsx` | `StyleScreen` from `@/features/style-demo/style-screen` |
-| `/settings` | `(app)/settings.tsx` | `SettingsScreen` from `@/features/settings/settings-screen` |
-| `/feed/[id]` | `feed/[id].tsx` | `PostDetailScreen` from `@/features/feed/post-detail-screen` |
-| `/feed/add-post` | `feed/add-post.tsx` | `AddPostScreen` from `@/features/feed/add-post-screen` |
-| `/login` | `login.tsx` | `LoginScreen` from `@/features/auth/login-screen` |
-| `/onboarding` | `onboarding.tsx` | `OnboardingScreen` from `@/features/onboarding/onboarding-screen` |
-| any unmatched | `[...messing].tsx` | `NotFoundScreen` (defined inline) |
-| — | `+html.tsx` | Web-only static HTML shell |
+| URL | Name | File | Renders |
+|---|---|---|---|
+| — | — | `_layout.tsx` | Root `Stack` + provider tree (owns behavior) |
+| — | — | `(app)/_layout.tsx` | Native bottom tabs + route guard (owns behavior) |
+| `/` | `ROUTES.home` | `(app)/index.tsx` | `FeedScreen` from `@/features/feed/feed-screen` |
+| `/style` | `ROUTES.style` | `(app)/style.tsx` | `StyleScreen` from `@/features/style-demo/style-screen` |
+| `/settings` | `ROUTES.settings` | `(app)/settings.tsx` | `SettingsScreen` from `@/features/settings/settings-screen` |
+| `/feed/[id]` | `ROUTES.post(id)` | `feed/[id].tsx` | `PostDetailScreen` from `@/features/feed/post-detail-screen` |
+| `/feed/add-post` | `ROUTES.addPost` | `feed/add-post.tsx` | `AddPostScreen` from `@/features/feed/add-post-screen` |
+| `/login` | `ROUTES.login` | `login.tsx` | `LoginScreen` from `@/features/auth/login-screen` |
+| `/onboarding` | `ROUTES.onboarding` | `onboarding.tsx` | `OnboardingScreen` from `@/features/onboarding/onboarding-screen` |
+| any unmatched | — | `[...messing].tsx` | `NotFoundScreen` (defined inline) |
+| — | — | `+html.tsx` | Web-only static HTML shell |
+
+Moving or renaming a route means changing the file, this table, and the entry in
+`@/lib/navigation` — the registry is a second place the path is written down,
+and it is the one the type-checker guards.
 
 ## Behavior
 
@@ -43,10 +50,15 @@ files own the navigator structure and the auth/onboarding guard.
   is disabled in the root `firebase.json`, so this hook is the only source of
   screen analytics.
 - The `(app)` guard runs in a fixed order, and the order is load-bearing:
-  first-run → `/onboarding`; then `!isLoaded` → render nothing; then
-  `!isSignedIn` → `/login`. Returning `null` while Clerk restores the session
-  from the token cache is what stops an already-signed-in user being bounced to
-  `/login`.
+  first-run → `ROUTES.onboarding`; then `!isLoaded` → render nothing; then
+  `!isSignedIn` → `ROUTES.login`. Returning `null` while Clerk restores the
+  session from the token cache is what stops an already-signed-in user being
+  bounced to `/login`.
+- No file here writes a route path as a literal. The guard's two `<Redirect>`s
+  and the catch-all's "Go to home screen!" `<Link>` all take their `href` from
+  `ROUTES`, so a path that does not exist fails to compile. `Link`, `Stack`,
+  `useRouter` and `useLocalSearchParams` still come straight from `expo-router`
+  — only the path strings are registered.
 - The tab bar is native: a SwiftUI `TabView` on iOS and a Material
   `BottomNavigationView` on Android, from `react-native-bottom-tabs` via
   `withLayoutContext`. It is not the JS tab bar `expo-router` ships.

@@ -9,6 +9,7 @@ import {
   View,
 } from '@/components/ui';
 import { useIsFirstTime } from '@/lib/hooks';
+import { ROUTES } from '@/lib/navigation';
 import { Cover } from './components/cover';
 
 export function OnboardingScreen() {
@@ -47,7 +48,7 @@ export function OnboardingScreen() {
           label="Let's Get Started "
           onPress={() => {
             setIsFirstTime(false);
-            router.replace('/login');
+            router.replace(ROUTES.login);
           }}
         />
       </SafeAreaView>

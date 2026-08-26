@@ -1,6 +1,7 @@
 import type * as React from 'react';
 
-import { cleanup, render, screen } from '@/lib/test-utils';
+import { SafeAreaView } from '@/components/ui';
+import { cleanup, render, screen, within } from '@/lib/test-utils';
 
 import { FeedScreen } from '../feed-screen';
 
@@ -71,6 +72,21 @@ describe('feedScreen header', () => {
     render(<FeedScreen />);
 
     expect(screen.getByText('Create')).toBeOnTheScreen();
+  });
+
+  it('insets the header below the status bar so its link is tappable', () => {
+    render(<FeedScreen />);
+
+    // The app draws edge-to-edge. Without the top inset the row lands under the
+    // status bar and the system swallows every tap on "Create" — the reason
+    // this assertion exists. Only the top edge: the native tab bar owns the
+    // bottom one.
+    const [safeArea] = screen.UNSAFE_getAllByType(SafeAreaView);
+
+    expect(safeArea.props.edges).toEqual(['top']);
+    expect(
+      within(safeArea).getByTestId('create-post-link'),
+    ).toBeOnTheScreen();
   });
 
   it('renders posts returned by the feed', () => {
