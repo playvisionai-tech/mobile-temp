@@ -10,6 +10,7 @@ import * as React from 'react';
 
 import { getTabIcon } from '@/components/ui/tab-icons';
 import { useIsFirstTime } from '@/lib/hooks/use-is-first-time';
+import { ROUTES } from '@/lib/navigation';
 
 // The navigator is mounted exactly once, here, which is why it is not wrapped:
 // Expo Router requires it to be declared in the layout. The icons ARE wrapped —
@@ -28,7 +29,7 @@ export default function TabLayout() {
   const [isFirstTime] = useIsFirstTime();
 
   if (isFirstTime) {
-    return <Redirect href="/onboarding" />;
+    return <Redirect href={ROUTES.onboarding} />;
   }
   // Clerk restores the session from the token cache asynchronously. Redirecting
   // before that resolves would bounce an already-signed-in user to /login.
@@ -36,7 +37,7 @@ export default function TabLayout() {
     return null;
   }
   if (!isSignedIn) {
-    return <Redirect href="/login" />;
+    return <Redirect href={ROUTES.login} />;
   }
   return (
     <Tabs>

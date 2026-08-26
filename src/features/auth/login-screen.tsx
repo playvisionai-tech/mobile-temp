@@ -6,6 +6,7 @@ import { useRouter } from 'expo-router';
 import * as React from 'react';
 import { FocusAwareStatusBar, showErrorMessage } from '@/components/ui';
 import { translate } from '@/lib/i18n';
+import { ROUTES } from '@/lib/navigation';
 import { LoginForm } from './components/login-form';
 
 export function LoginScreen() {
@@ -31,7 +32,7 @@ export function LoginScreen() {
       if (signIn.status === 'complete') {
         await signIn.finalize({
           navigate: ({ decorateUrl }) => {
-            router.replace(decorateUrl('/') as Href);
+            router.replace(decorateUrl(ROUTES.home) as Href);
           },
         });
       }

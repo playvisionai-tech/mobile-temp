@@ -3,6 +3,7 @@ import * as React from 'react';
 
 import { getTabIcon } from '@/components/ui/tab-icons';
 import { useIsFirstTime } from '@/lib/hooks/use-is-first-time';
+import { ROUTES } from '@/lib/navigation';
 import { cleanup, render, screen } from '@/lib/test-utils';
 
 import TabLayout from '../_layout';
@@ -65,7 +66,7 @@ describe('authenticated app route guard', () => {
 
     render(<TabLayout />);
 
-    expect(screen.getByTestId('redirect-/onboarding')).toBeOnTheScreen();
+    expect(screen.getByTestId(`redirect-${ROUTES.onboarding}`)).toBeOnTheScreen();
   });
 
   it('renders nothing while Clerk restores a returning session', () => {
@@ -81,7 +82,7 @@ describe('authenticated app route guard', () => {
 
     render(<TabLayout />);
 
-    expect(screen.getByTestId('redirect-/login')).toBeOnTheScreen();
+    expect(screen.getByTestId(`redirect-${ROUTES.login}`)).toBeOnTheScreen();
   });
 
   it('renders the stable tab contract for signed-in users', () => {

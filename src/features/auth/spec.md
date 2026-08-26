@@ -19,8 +19,13 @@ to outgoing API requests.
   user stays on the login screen; nothing else is reset.
 - On success, when `signIn.status === 'complete'`, the screen calls
   `signIn.finalize({ navigate })`, which activates the session and does
-  `router.replace(decorateUrl('/'))`. Without `finalize()` the status reaches
-  `complete` but no session is activated and the route guard bounces back.
+  `router.replace(decorateUrl(ROUTES.home))`. Without `finalize()` the status
+  reaches `complete` but no session is activated and the route guard bounces
+  back.
+- The destination comes from the `ROUTES` registry in `@/lib/navigation`; this
+  screen writes no path literal. Clerk's `decorateUrl` appends its handshake
+  params and is typed `(url: string) => string`, so the decorated result is
+  cast back to `Href` at the `router.replace` call.
 - The `(app)` route guard reads `isSignedIn` / `isLoaded` from Clerk's
   `useAuth()`. While `!isLoaded` it renders nothing, so an already-signed-in
   user is not redirected during Clerk's async session restore. When loaded and
@@ -35,6 +40,7 @@ to outgoing API requests.
 ## Entry points
 - Route: `src/app/login.tsx` → `features/auth/login-screen.tsx`
 - Route guard: `src/app/(app)/_layout.tsx` (Clerk `useAuth()`)
+- Navigation: `ROUTES` from `@/lib/navigation`
 - Session state: Clerk only — `ClerkProvider` in `src/app/_layout.tsx` is
   configured with `tokenCache` from `@clerk/expo/token-cache`. There is no
   Zustand auth store.
