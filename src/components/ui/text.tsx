@@ -30,12 +30,12 @@ export function Text({
 
   const nStyle = React.useMemo(
     () =>
-      StyleSheet.flatten([
+      StyleSheet.flatten<TextStyle>([
         {
           writingDirection: I18nManager.isRTL ? 'rtl' : 'ltr',
         },
         style,
-      ]) as TextStyle,
+      ]),
     [style],
   );
   return (

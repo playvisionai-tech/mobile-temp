@@ -7,7 +7,10 @@ import { LoginForm } from '../login-form';
 
 afterEach(cleanup);
 
-const onSubmitMock: jest.Mock<LoginFormProps['onSubmit']> = jest.fn();
+const onSubmitMock: jest.Mock<
+  void,
+  Parameters<NonNullable<LoginFormProps['onSubmit']>>
+> = jest.fn();
 
 describe('loginForm Form ', () => {
   it('renders correctly', async () => {

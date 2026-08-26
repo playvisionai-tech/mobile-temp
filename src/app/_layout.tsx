@@ -36,7 +36,7 @@ loadSelectedTheme();
 // until this settles, and it never rejects.
 void initializeFeatureFlags();
 // Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
+void SplashScreen.preventAutoHideAsync();
 // Set the animation options. This is optional.
 SplashScreen.setOptions({
   duration: 500,

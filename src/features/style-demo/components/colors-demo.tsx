@@ -27,7 +27,7 @@ function Color({ name }: { name: ColorName }) {
         {Object.entries(colors[name]).map(([key, value]) => {
           return (
             <ColorCard
-              key={`${colors[name]}-${key}`}
+              key={`${name}-${key}`}
               value={key}
               color={value}
             />

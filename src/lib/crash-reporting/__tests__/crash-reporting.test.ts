@@ -17,7 +17,7 @@ jest.mock('@react-native-firebase/crashlytics', () => ({
   setCrashlyticsCollectionEnabled: jest.fn(() => Promise.resolve(null)),
 }));
 
-const native = jest.requireMock('@react-native-firebase/crashlytics') as Record<string, jest.Mock>;
+const native = jest.requireMock<Record<string, jest.Mock>>('@react-native-firebase/crashlytics');
 
 const originalDev = __DEV__;
 

@@ -61,7 +61,7 @@ const androidIconCache = new Map<TabIconName, ImageSourcePropType>();
 export function getTabIcon(name: TabIconName): ImageSourcePropType | AppleIcon {
   const icon = TAB_ICONS[name];
 
-  if (icon.asset) {
+  if (icon.asset !== undefined) {
     return icon.asset;
   }
 
@@ -70,7 +70,7 @@ export function getTabIcon(name: TabIconName): ImageSourcePropType | AppleIcon {
   }
 
   const cached = androidIconCache.get(name);
-  if (cached) {
+  if (cached !== undefined) {
     return cached;
   }
 

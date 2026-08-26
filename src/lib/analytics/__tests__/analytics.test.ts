@@ -24,8 +24,8 @@ jest.mock('expo-router', () => ({
   usePathname: jest.fn(() => '/feed'),
 }));
 
-const native = jest.requireMock('@react-native-firebase/analytics') as Record<string, jest.Mock>;
-const router = jest.requireMock('expo-router') as { usePathname: jest.Mock };
+const native = jest.requireMock<Record<string, jest.Mock>>('@react-native-firebase/analytics');
+const router = jest.requireMock<{ usePathname: jest.Mock }>('expo-router');
 
 /** Runtime-only entry point: what a JavaScript caller, or an `any`, can reach. */
 const trackUnchecked = trackEvent as unknown as (

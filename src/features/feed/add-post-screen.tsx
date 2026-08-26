@@ -29,7 +29,7 @@ export function AddPostScreen() {
     },
 
     validators: {
-      onChange: schema as any,
+      onChange: schema,
     },
     onSubmit: ({ value }) => {
       console.log(value);
@@ -94,7 +94,7 @@ export function AddPostScreen() {
             <Button
               label="Add Post"
               loading={isPending || isSubmitting}
-              onPress={form.handleSubmit}
+              onPress={() => void form.handleSubmit()}
               testID="add-post-button"
             />
           )}

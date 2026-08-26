@@ -4,7 +4,11 @@ export const storage = createMMKV();
 
 export function getItem<T>(key: string): T | null {
   const value = storage.getString(key);
-  return value ? JSON.parse(value) || null : null;
+  if (!value) {
+    return null;
+  }
+  // JSON.parse is `any`; the caller's T is the only claim about the shape.
+  return (JSON.parse(value) as T | null) ?? null;
 }
 
 export async function setItem<T>(key: string, value: T) {

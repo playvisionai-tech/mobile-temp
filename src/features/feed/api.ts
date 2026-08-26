@@ -16,8 +16,9 @@ type PostsVariables = void;
 
 export const usePosts = createQuery<PostsResponse, PostsVariables, AxiosError>({
   queryKey: ['posts'],
-  fetcher: () => {
-    return client.get(`posts`).then(response => response.data.posts);
+  fetcher: async () => {
+    const response = await client.get<{ posts: PostsResponse }>(`posts`);
+    return response.data.posts;
   },
 });
 
@@ -26,10 +27,9 @@ type PostVariables = { id: string };
 
 export const usePost = createQuery<PostResponse, PostVariables, AxiosError>({
   queryKey: ['posts'],
-  fetcher: (variables) => {
-    return client
-      .get(`posts/${variables.id}`)
-      .then(response => response.data);
+  fetcher: async (variables) => {
+    const response = await client.get<PostResponse>(`posts/${variables.id}`);
+    return response.data;
   },
 });
 
@@ -37,10 +37,12 @@ type AddPostResponse = Post;
 type AddPostVariables = { title: string; body: string; userId: number };
 
 export const useAddPost = createMutation<AddPostResponse, AddPostVariables, AxiosError>({
-  mutationFn: async variables =>
-    client({
+  mutationFn: async (variables) => {
+    const response = await client<AddPostResponse>({
       url: 'posts/add',
       method: 'POST',
       data: variables,
-    }).then(response => response.data),
+    });
+    return response.data;
+  },
 });
