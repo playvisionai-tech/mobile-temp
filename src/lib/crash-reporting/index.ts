@@ -113,7 +113,7 @@ export function setCrashUser(userId: string | null): void {
     return;
   }
 
-  run((api, crashlytics) => api.setUserId(crashlytics, userId ?? ''));
+  run(async (api, crashlytics) => api.setUserId(crashlytics, userId ?? ''));
 }
 
 /** Add a breadcrumb to the log that ships with the next report. */

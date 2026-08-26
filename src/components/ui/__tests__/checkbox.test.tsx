@@ -9,6 +9,61 @@ import 'react-native';
 
 afterEach(cleanup);
 
+// The reanimated jest mock resolves `useAnimatedStyle` eagerly and makes
+// `withTiming`/`withSpring` return their target, so the styles read below are
+// the values each control settles on. `react-test-renderer` ships no types, so
+// the tree nodes are described structurally.
+type StyleNode = {
+  type: unknown;
+  props: { style?: unknown };
+};
+
+function layersOf(node: StyleNode) {
+  const { style } = node.props;
+  return (Array.isArray(style) ? style : [style]).filter(
+    (layer): layer is Record<string, unknown> =>
+      typeof layer === 'object' && layer !== null,
+  );
+}
+
+function isHost(node: StyleNode) {
+  return typeof node.type === 'string';
+}
+
+function opacities(testID: string) {
+  const faded: StyleNode[] = screen
+    .getByTestId(testID)
+    .findAll((node: StyleNode) =>
+      isHost(node)
+      && layersOf(node).some(layer => typeof layer.opacity === 'number'));
+
+  return faded.flatMap(node =>
+    layersOf(node)
+      .map(layer => layer.opacity)
+      .filter((opacity): opacity is number => typeof opacity === 'number'));
+}
+
+function boxStyleKeys(testID: string) {
+  const [box]: StyleNode[] = screen
+    .getByTestId(testID)
+    .findAll((node: StyleNode) =>
+      isHost(node) && layersOf(node).some(layer => 'borderColor' in layer));
+
+  return layersOf(box).flatMap(layer => Object.keys(layer));
+}
+
+function thumbTranslateX(testID: string) {
+  const [thumb]: StyleNode[] = screen
+    .getByTestId(testID)
+    .findAll((node: StyleNode) =>
+      isHost(node) && layersOf(node).some(layer => 'transform' in layer));
+
+  const transform = layersOf(thumb)
+    .flatMap(layer => (layer.transform ?? []) as Record<string, unknown>[]);
+
+  return transform.map(entry => entry.translateX)[0];
+}
+
 describe('checkbox, Radio & Switch components ', () => {
   it('supports composing control roots, icons, and labels', () => {
     const onChange = jest.fn();
@@ -256,5 +311,67 @@ describe('checkbox, Radio & Switch components ', () => {
     expect(screen.getByTestId('switch')).toBeOnTheScreen();
     await user.press(screen.getByTestId('switch'));
     expect(mockOnChange).toHaveBeenCalledTimes(0);
+  });
+  it.each([
+    [true, 1],
+    [false, 0],
+  ])('<Checkbox checked={%s} /> settles its fill and checkmark at opacity %d', (checked, opacity) => {
+    setup(
+      <Checkbox
+        checked={checked}
+        testID="checkbox"
+        onChange={jest.fn()}
+        accessibilityLabel="agree"
+      />,
+    );
+
+    // Two layers fade together: the coloured fill behind the box, and the
+    // checkmark drawn on top of it.
+    expect(opacities('checkbox')).toEqual([opacity, opacity]);
+  });
+
+  it.each([[true], [false]])('<Checkbox checked={%s} /> never paints a box background, so the surface behind shows through in either theme', (checked) => {
+    setup(
+      <Checkbox
+        checked={checked}
+        testID="checkbox"
+        onChange={jest.fn()}
+        accessibilityLabel="agree"
+      />,
+    );
+
+    expect(boxStyleKeys('checkbox')).not.toContain('backgroundColor');
+  });
+
+  it.each([
+    [true, 1],
+    [false, 0],
+  ])('<Radio checked={%s} /> settles its dot at opacity %d', (checked, opacity) => {
+    setup(
+      <Radio
+        checked={checked}
+        testID="radio"
+        onChange={jest.fn()}
+        accessibilityLabel="pick one"
+      />,
+    );
+
+    expect(opacities('radio')).toEqual([opacity]);
+  });
+
+  it.each([
+    [true, -4],
+    [false, -24],
+  ])('<Switch checked={%s} /> settles its thumb at translateX %d', (checked, translateX) => {
+    setup(
+      <Switch
+        checked={checked}
+        testID="switch"
+        onChange={jest.fn()}
+        accessibilityLabel="toggle"
+      />,
+    );
+
+    expect(thumbTranslateX('switch')).toBe(translateX);
   });
 });

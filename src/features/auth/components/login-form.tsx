@@ -8,7 +8,7 @@ import { Button, Input, Text, View } from '@/components/ui';
 import { getFieldError } from '@/components/ui/form-utils';
 
 const schema = z.object({
-  name: z.string().optional(),
+  name: z.string(),
   email: z
     .string({
       message: 'Email is required',
@@ -26,7 +26,7 @@ const schema = z.object({
 export type FormType = z.infer<typeof schema>;
 
 export type LoginFormProps = {
-  onSubmit?: (data: FormType) => void;
+  onSubmit?: (data: FormType) => void | Promise<void>;
 };
 
 export function LoginForm({ onSubmit = () => {} }: LoginFormProps) {
@@ -38,10 +38,10 @@ export function LoginForm({ onSubmit = () => {} }: LoginFormProps) {
     },
 
     validators: {
-      onChange: schema as any,
+      onChange: schema,
     },
     onSubmit: async ({ value }) => {
-      onSubmit(value);
+      await onSubmit(value);
     },
   });
 
@@ -116,7 +116,7 @@ export function LoginForm({ onSubmit = () => {} }: LoginFormProps) {
             <Button
               testID="login-button"
               label="Login"
-              onPress={form.handleSubmit}
+              onPress={() => void form.handleSubmit()}
               loading={isSubmitting}
             />
           )}

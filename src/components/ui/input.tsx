@@ -51,7 +51,7 @@ export function Input({ ref, ...props }: NInputProps & { ref?: React.Ref<NTextIn
   const [isFocussed, setIsFocussed] = React.useState(false);
 
   const onBlur = React.useCallback(
-    (e: any) => {
+    (e: Parameters<NonNullable<TextInputProps['onBlur']>>[0]) => {
       setIsFocussed(false);
       onBlurProp?.(e);
     },
@@ -59,7 +59,7 @@ export function Input({ ref, ...props }: NInputProps & { ref?: React.Ref<NTextIn
   );
 
   const onFocus = React.useCallback(
-    (e: any) => {
+    (e: Parameters<NonNullable<TextInputProps['onFocus']>>[0]) => {
       setIsFocussed(true);
       onFocusProp?.(e);
     },

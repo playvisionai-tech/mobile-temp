@@ -73,7 +73,7 @@ export function Modal({ ref, snapPoints: _snapPoints = ['60%'] as (string | numb
 
   React.useImperativeHandle(
     ref,
-    () => (modal.ref.current as BottomSheetModal) || null,
+    () => modal.ref.current as BottomSheetModal,
   );
 
   const renderHandleComponent = React.useCallback(

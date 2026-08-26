@@ -1,0 +1,8 @@
+shellEmulator: true
+
+trustPolicy: no-downgrade
+
+patchedDependencies:
+  '@react-native-firebase/app@26.3.2': patches/@react-native-firebase__app@26.3.2.patch
+  '@react-native-firebase/crashlytics@26.3.2': patches/@react-native-firebase__crashlytics@26.3.2.patch
+  '@react-native-firebase/remote-config@26.3.2': patches/@react-native-firebase__remote-config@26.3.2.patch

@@ -48,12 +48,21 @@ fix the spec in the same change.
 
 `firebase/<env>/GoogleService-Info.plist` and `google-services.json` are
 **placeholders with fabricated keys**, and `.env`'s
-`EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY` is a placeholder too. The app builds, boots
-and runs, but Analytics, Crashlytics and Remote Config **fail silently** —
-nothing reaches Firebase, no error is raised, and reads fall back to in-app
-defaults. Never report telemetry as "working" on the strength of a local run:
+`EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY` is a placeholder too. The app builds and
+runs, but Analytics, Crashlytics and Remote Config **fail silently** — nothing
+reaches Firebase, no error is raised, and reads fall back to in-app defaults.
+Never report telemetry as "working" on the strength of a local run:
 `firebase/README.md` says what to replace. Clerk is louder — an invalid
 publishable key makes `ClerkProvider` throw at render.
+
+**A placeholder still has to be well-formed.** Firebase validates the *shape* of
+its config at startup, before any JS runs: `FirebaseInstallations` requires
+`API_KEY` to be 39 characters and to start with `A`, and raises an uncaught
+Objective-C exception when it is not. That exception aborts the process, so a
+malformed placeholder is a **launch crash (SIGABRT), not silent no-op
+telemetry** — on iOS the app never reaches first render. The committed keys are
+fabricated but deliberately format-valid for this reason. When editing them,
+keep the shape; only the value is fake.
 
 ## Do
 

@@ -36,12 +36,18 @@ else in `src/`.
 - The native module is resolved on **every** call and the result is not cached.
   A call made before the default Firebase app is initialized no-ops, and the
   next call after initialization works.
+- `setCrashUser` hands `run` an async callback. `run` swallows both a
+  synchronous throw and a rejected promise, so crash reporting cannot fail into
+  the code path it is observing.
 
 ## Entry points
 - `recordError`, `setCrashUser`, `logCrashBreadcrumb`,
   `setCrashReportingEnabled` from `@/lib/crash-reporting`.
 - Nothing mounts or configures this module. There is no provider; the native SDK
   starts itself from the Firebase config in the build.
+- `setCrashUser` is called from one place: `TelemetryIdentity` in
+  `src/features/auth/`, which passes Clerk's opaque `userId` and `null` on
+  sign-out. This module neither knows nor asks who the user is.
 
 ## Platform differences
 - None in this module. iOS and Android divergence is handled inside the Firebase

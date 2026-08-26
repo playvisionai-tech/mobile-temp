@@ -4,14 +4,19 @@
 Email/password sign-in backed by Clerk. Clerk owns session state end to end:
 there is no local auth store. Once a session exists, Clerk's token cache
 persists it across app restarts and `src/lib/api/client.tsx` attaches its JWT
-to outgoing API requests.
+to outgoing API requests. The feature also owns the telemetry identity — the
+one place that tells analytics and crash reporting which account is signed in.
 
 ## Behavior
-- The login screen renders `components/login-form.tsx`: an optional Name field
-  plus Email and Password, built from `@/components/ui` primitives.
+- The login screen renders `components/login-form.tsx`: a Name field plus Email
+  and Password, built from `@/components/ui` primitives. Name carries no
+  validation of its own, so leaving it blank submits cleanly.
 - The form is validated on change by `@tanstack/react-form` against a Zod
   schema — email required and well-formed, password required and at least 6
-  characters. The submit button shows a loading state while submitting.
+  characters. The submit button shows a loading state for as long as submission
+  is in flight — the form awaits the `onSubmit` it is given, so the spinner spans
+  the screen's Clerk call rather than stopping the moment the handler is
+  invoked.
 - Submitting calls `signIn.password({ emailAddress, password })` from Clerk's
   `useSignIn()`. That call resolves with `{ error }` instead of throwing, so the
   screen branches on the returned `error` rather than using try/catch.
@@ -37,9 +42,35 @@ to outgoing API requests.
   rejects the promise. It does not retry the request and does not touch the
   React Query cache.
 
+### Telemetry identity
+- `telemetry-identity.tsx` exports `TelemetryIdentity`, a component that renders
+  nothing and is mounted once by `src/app/_layout.tsx`, inside `ClerkProvider`.
+- It reads `useAuth()` and mirrors the session into both telemetry wrappers:
+  `setAnalyticsUser` from `@/lib/analytics` and `setCrashUser` from
+  `@/lib/crash-reporting`, always with the same value.
+- Signed in → Clerk's opaque `userId`. Signed out → `null`, which clears the id
+  in both. So a crash report or an event carries the account that produced it,
+  and a signed-out session carries nothing.
+- While `isLoaded` is false it does nothing at all. Clerk reports `undefined`
+  during session restore, which is neither an id to set nor a sign-out to
+  clear; clearing there would wipe a returning user's id on every cold start.
+- The trigger is Clerk's auth state, never the login screen's success path.
+  A session also appears when the token cache restores one on a cold start, and
+  disappears when the 401 interceptor signs the user out — neither goes through
+  the login button, and both are covered because this watches Clerk itself.
+- It re-identifies only when the id actually changes; a re-render at the same
+  session sends nothing.
+- **Only the opaque `userId` is ever passed.** No email, name, or any other
+  value a human could read — see the PII rule in `src/lib/analytics/spec.md`.
+  Both wrappers drop a value that looks like PII, so sending one would silently
+  lose the identity rather than leak it, but the rule holds at this call site
+  first.
+
 ## Entry points
 - Route: `src/app/login.tsx` → `features/auth/login-screen.tsx`
 - Route guard: `src/app/(app)/_layout.tsx` (Clerk `useAuth()`)
+- Telemetry identity: `<TelemetryIdentity />` from
+  `@/features/auth/telemetry-identity`, mounted in `src/app/_layout.tsx`
 - Navigation: `ROUTES` from `@/lib/navigation`
 - Session state: Clerk only — `ClerkProvider` in `src/app/_layout.tsx` is
   configured with `tokenCache` from `@clerk/expo/token-cache`. There is no
@@ -53,5 +84,7 @@ to outgoing API requests.
 
 ## Out of scope
 - Sign-up, password reset, and email verification — not implemented here.
+- User properties, traits or any telemetry attribute beyond the user id.
+  `TelemetryIdentity` sets an id and nothing else.
 - Social login (Google, Apple) — not implemented.
 - Biometric unlock — deferred.

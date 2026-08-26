@@ -25,6 +25,10 @@ Displays a list of posts. Users can open a separate screen to add a post.
   post id as a param — which shows loading, failure, and loaded-detail states.
 - Every destination this feature links to comes from the `ROUTES` registry in
   `@/lib/navigation`. No screen or component here writes a path literal.
+- The queries name their response shapes where they call the API client
+  (`client.get<...>`), so a `Post` reaches React Query without passing through an
+  untyped step: the list reads `data.posts`, the detail and the create read
+  `data`.
 
 ## Entry points
 - Route: `src/app/(app)/index.tsx` → `features/feed/feed-screen.tsx`

@@ -107,7 +107,7 @@ export function Button({ ref, label: text, loading = false, variant = 'default',
       ref={ref}
       testID={testID}
     >
-      {props.children
+      {props.children != null
         ? (
             props.children
           )

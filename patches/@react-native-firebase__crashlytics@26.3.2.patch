@@ -1,0 +1,19 @@
+diff --git a/ios/RNFBCrashlytics/RNFBCrashlyticsModule.mm b/ios/RNFBCrashlytics/RNFBCrashlyticsModule.mm
+index 948c419cb4f0fd9171b50702ea8a260c17067628..a54454e2917af0bbd4bfc4db3599b43b76e8d302 100644
+--- a/ios/RNFBCrashlytics/RNFBCrashlyticsModule.mm
++++ b/ios/RNFBCrashlytics/RNFBCrashlyticsModule.mm
+@@ -65,12 +65,12 @@ - (NSDictionary *)crashlyticsConstantsDictionary {
+   return constants;
+ }
+ 
+-- (facebook::react::ModuleConstants<JS::NativeRNFBTurboCrashlytics::Constants::Builder>)
++- (facebook::react::ModuleConstants<JS::NativeRNFBTurboCrashlytics::Constants>)
+     constantsToExport {
+   return [_RCTTypedModuleConstants newWithUnsafeDictionary:[self crashlyticsConstantsDictionary]];
+ }
+ 
+-- (facebook::react::ModuleConstants<JS::NativeRNFBTurboCrashlytics::Constants::Builder>)
++- (facebook::react::ModuleConstants<JS::NativeRNFBTurboCrashlytics::Constants>)
+     getConstants {
+   return [self constantsToExport];
+ }

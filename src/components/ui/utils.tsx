@@ -44,7 +44,7 @@ export function extractError(data: unknown): string {
   }
 
   if (typeof data === 'object' && data !== null) {
-    const messages = Object.entries(data).map((item) => {
+    const messages = Object.entries(data as Record<string, unknown>).map((item) => {
       const [key, value] = item;
       const separator = Array.isArray(value) ? ':\n ' : ': ';
 

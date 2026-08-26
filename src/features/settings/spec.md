@@ -18,6 +18,8 @@ support/links rows, and a logout row.
   using `settings.logout_failed` and the error is logged.
 - Icon tint follows the active Uniwind theme (`colors.neutral[400]` in dark,
   `colors.neutral[500]` in light).
+- A row renders its optional `icon` only when one is supplied. The test is for
+  presence, so a falsy-but-valid node is never rendered bare into the row.
 
 ## Entry points
 - Route: `src/app/(app)/settings.tsx` → `features/settings/settings-screen.tsx`

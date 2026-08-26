@@ -1,3 +1,4 @@
+import type { AxiosError } from 'axios';
 import { getClerkInstance } from '@clerk/expo';
 import axios from 'axios';
 import Env from 'env';
@@ -40,8 +41,11 @@ client.interceptors.request.use(async (config) => {
 // flag was set on a per-request config object that is never reused.
 client.interceptors.response.use(
   response => response,
-  async (error) => {
-    if (error.response?.status === 401) {
+  async (error: unknown) => {
+    // Structural, not `axios.isAxiosError`: the guard only needs the status,
+    // and requiring a genuine AxiosError would stop recognising a rejection
+    // that merely looks like one.
+    if ((error as AxiosError | undefined)?.response?.status === 401) {
       try {
         await getClerk().signOut();
       }

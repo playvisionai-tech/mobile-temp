@@ -171,7 +171,7 @@ export function trackScreen(screenName: string, screenClass?: string): void {
     return;
   }
 
-  run((api, analytics) => api.logScreenView(analytics, {
+  run(async (api, analytics) => api.logScreenView(analytics, {
     screen_name: name,
     screen_class: (screenClass ?? name).trim().slice(0, MAX_STRING_LENGTH) || name,
   }));
@@ -187,7 +187,7 @@ export function setAnalyticsUser(userId: string | null): void {
     return;
   }
 
-  run((api, analytics) => api.setUserId(analytics, userId));
+  run(async (api, analytics) => api.setUserId(analytics, userId));
 }
 
 /** Turn collection on or off. Resolves even when the native module is absent. */

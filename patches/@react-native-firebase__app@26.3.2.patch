@@ -1,0 +1,37 @@
+diff --git a/ios/RNFBApp/RNFBAppModule.mm b/ios/RNFBApp/RNFBAppModule.mm
+index ba1a750ca03bd96b97869bd363dc1c54b8586c8a..024650091b6648a7b5521ecc8d8df5244be6852c 100644
+--- a/ios/RNFBApp/RNFBAppModule.mm
++++ b/ios/RNFBApp/RNFBAppModule.mm
+@@ -102,11 +102,11 @@ - (NSDictionary *)appConstantsDictionary {
+   return constants;
+ }
+ 
+-- (facebook::react::ModuleConstants<JS::NativeRNFBTurboApp::Constants::Builder>)constantsToExport {
++- (facebook::react::ModuleConstants<JS::NativeRNFBTurboApp::Constants>)constantsToExport {
+   return [_RCTTypedModuleConstants newWithUnsafeDictionary:[self appConstantsDictionary]];
+ }
+ 
+-- (facebook::react::ModuleConstants<JS::NativeRNFBTurboApp::Constants::Builder>)getConstants {
++- (facebook::react::ModuleConstants<JS::NativeRNFBTurboApp::Constants>)getConstants {
+   return [self constantsToExport];
+ }
+ 
+diff --git a/ios/RNFBApp/RNFBUtilsModule.mm b/ios/RNFBApp/RNFBUtilsModule.mm
+index 55cf75e8132eb861597e588485dfea601633b4a4..84edf375a48e6eb865821cfd86da67b2199ad7db 100644
+--- a/ios/RNFBApp/RNFBUtilsModule.mm
++++ b/ios/RNFBApp/RNFBUtilsModule.mm
+@@ -69,12 +69,12 @@ - (NSDictionary *)utilsConstantsDictionary {
+   return [constants copy];
+ }
+ 
+-- (facebook::react::ModuleConstants<JS::NativeRNFBTurboUtils::Constants::Builder>)
++- (facebook::react::ModuleConstants<JS::NativeRNFBTurboUtils::Constants>)
+     constantsToExport {
+   return [_RCTTypedModuleConstants newWithUnsafeDictionary:[self utilsConstantsDictionary]];
+ }
+ 
+-- (facebook::react::ModuleConstants<JS::NativeRNFBTurboUtils::Constants::Builder>)getConstants {
++- (facebook::react::ModuleConstants<JS::NativeRNFBTurboUtils::Constants>)getConstants {
+   return [self constantsToExport];
+ }
+ 

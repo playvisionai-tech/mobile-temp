@@ -61,5 +61,10 @@ We changed auth to use Clerk because it's better.  # ❌ No trade-off, no altern
 - CI: `.github/workflows/drift-check.yml` blocks a PR on a missing or unchanged spec
 - CI: `lint-ts.yml`, `type-check.yml` and `test.yml` run independently on the same PR
 - ESLint: `local/spec-required` gives the same feedback in the editor and in `pnpm lint`
+- ESLint: the type-aware rule set is on — `eslint.config.mjs` passes `tsconfigPath`
+  to the TypeScript config, which is what activates `no-floating-promises`,
+  `no-misused-promises` and the rest. It is therefore slower than a syntax-only
+  lint and needs `tsconfig.json` to resolve. Its two relaxations and its
+  exemption for test scaffolding are commented where they are declared.
 - Review: verify spec.md rewritten (not appended), decisions.md appended only for trade-offs
 - Local: **`.husky/pre-commit` runs `pnpm type-check` and `pnpm lint-staged` only — it does not run `check-specs`.** Run `pnpm check-specs` yourself before committing, or CI will be the first to tell you.

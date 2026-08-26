@@ -15,16 +15,16 @@ describe('legacy token helpers', () => {
     expect(getItem).toHaveBeenCalledWith('token');
   });
 
-  it('writes the token key', () => {
+  it('writes the token key', async () => {
     const token = { access: 'access-token', refresh: 'refresh-token' };
 
-    setToken(token);
+    await setToken(token);
 
     expect(setItem).toHaveBeenCalledWith('token', token);
   });
 
-  it('removes the token key', () => {
-    removeToken();
+  it('removes the token key', async () => {
+    await removeToken();
 
     expect(removeItem).toHaveBeenCalledWith('token');
   });

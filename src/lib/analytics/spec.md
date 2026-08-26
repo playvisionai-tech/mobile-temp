@@ -81,6 +81,9 @@ someone's handle still passes. The registry is the real guarantee.
 - The native module is resolved on **every** call and the result is not cached.
   A call made before the default Firebase app is initialized no-ops, and the
   next call after initialization works.
+- `trackScreen` and `setAnalyticsUser` hand `run` an async callback. `run`
+  swallows both a synchronous throw and a rejected promise, so neither can
+  surface at the call site or leave an unhandled rejection behind.
 
 ## Entry points
 - `trackEvent`, `trackScreen`, `setAnalyticsUser`, `setAnalyticsEnabled`,
@@ -88,6 +91,9 @@ someone's handle still passes. The registry is the real guarantee.
   `@/lib/analytics`.
 - **This module mounts nothing.** `useScreenTracking` is exported for the root
   layout (`src/app/_layout.tsx`) to call; the module does not wire itself in.
+- `setAnalyticsUser` is called from one place: `TelemetryIdentity` in
+  `src/features/auth/`, which passes Clerk's opaque `userId` and `null` on
+  sign-out. This module neither knows nor asks who the user is.
 
 ## Platform differences
 - None in this module. iOS and Android divergence is handled inside the Firebase

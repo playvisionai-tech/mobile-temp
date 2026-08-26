@@ -15,6 +15,9 @@ Clerk is the single source of session truth.
 - `TokenType` is `{ access: string; refresh: string }`.
 - The module does not talk to Clerk. It exports no `signOut()`, no session
   accessor, and no refresh logic.
+- `setToken` and `removeToken` are async wrappers over the synchronous MMKV
+  writes in `@/lib/storage`. The write has already happened by the time the
+  promise is returned, so awaiting them changes no ordering.
 
 ## Entry points
 - None. No file in `src/` imports from `@/lib/auth`.
