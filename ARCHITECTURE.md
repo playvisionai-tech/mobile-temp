@@ -203,8 +203,6 @@ Stated here rather than hidden, so nobody rediscovers them as surprises.
 - **Nothing sets the telemetry user id yet.** `setCrashUser` / `setAnalyticsUser`
   exist and are tested, but no sign-in or sign-out path calls them, so events and
   crashes are anonymous. Wiring them is a change to `src/features/auth/`.
-- **`nativewind-env.d.ts` is still referenced from `tsconfig.json`** even though
-  styling moved to uniwind. Harmless, and not yet cleaned up.
 - **There is no single CI pipeline.** The workflows in `.github/workflows/` are
   independent jobs that run in parallel. The ordered sequence
   (`lint → type-check → translations → test → check-specs`) exists only as the
