@@ -27,6 +27,9 @@ the rest of the app queries through.
   from `provider.tsx`, and the pagination helpers in `utils.tsx`
   (`getQueryKey`, `normalizePages`, `getNextPageParam`, `getPreviousPageParam`,
   `PaginateQuery`, `DEFAULT_LIMIT`).
+- The 401 guard reads `error.response?.status` structurally rather than asking
+  `axios.isAxiosError`. Any rejection carrying that shape signs the user out,
+  which is also the shape the interceptor's tests reject with.
 
 ## Entry points
 - Used by feature API modules (e.g. `features/feed/api.ts`).

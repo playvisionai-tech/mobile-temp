@@ -38,6 +38,18 @@ The icon set is eight in-app SVG components: `ArrowRight`, `CaretDown`,
 not among them — the native bar cannot render a React component, so it takes
 its icons from `getTabIcon` instead.
 
+## Prop contracts worth knowing
+- `Button` renders its `children` when any are passed, and falls back to `label`
+  — or to the activity indicator while `loading` — only when `children` is
+  absent. The test is for presence, not truthiness.
+- `Input` forwards blur and focus to the caller's `onBlur` / `onFocus` carrying
+  React Native's own `TextInput` event, so a handler written against
+  `TextInputProps` fits with no cast.
+- `getFieldError(field)` reads `state.meta.isTouched` and `state.meta.errors` and
+  nothing else, so any form field carrying those satisfies it. It returns
+  `undefined` for an untouched or error-free field, the string for a string
+  error, the `message` of an object error, and otherwise the value stringified.
+
 ## Theme
 There is no `tailwind.config.js`. Colors, fonts, and semantic tokens are
 defined as CSS variables in the `@theme` block of `src/global.css`

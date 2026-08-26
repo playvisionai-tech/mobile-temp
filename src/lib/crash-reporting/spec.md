@@ -36,6 +36,9 @@ else in `src/`.
 - The native module is resolved on **every** call and the result is not cached.
   A call made before the default Firebase app is initialized no-ops, and the
   next call after initialization works.
+- `setCrashUser` hands `run` an async callback. `run` swallows both a
+  synchronous throw and a rejected promise, so crash reporting cannot fail into
+  the code path it is observing.
 
 ## Entry points
 - `recordError`, `setCrashUser`, `logCrashBreadcrumb`,

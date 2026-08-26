@@ -7,11 +7,15 @@ persists it across app restarts and `src/lib/api/client.tsx` attaches its JWT
 to outgoing API requests.
 
 ## Behavior
-- The login screen renders `components/login-form.tsx`: an optional Name field
-  plus Email and Password, built from `@/components/ui` primitives.
+- The login screen renders `components/login-form.tsx`: a Name field plus Email
+  and Password, built from `@/components/ui` primitives. Name carries no
+  validation of its own, so leaving it blank submits cleanly.
 - The form is validated on change by `@tanstack/react-form` against a Zod
   schema — email required and well-formed, password required and at least 6
-  characters. The submit button shows a loading state while submitting.
+  characters. The submit button shows a loading state for as long as submission
+  is in flight — the form awaits the `onSubmit` it is given, so the spinner spans
+  the screen's Clerk call rather than stopping the moment the handler is
+  invoked.
 - Submitting calls `signIn.password({ emailAddress, password })` from Clerk's
   `useSignIn()`. That call resolves with `{ error }` instead of throwing, so the
   screen branches on the returned `error` rather than using try/catch.

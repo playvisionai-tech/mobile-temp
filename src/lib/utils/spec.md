@@ -16,6 +16,9 @@ that needs them, and only the tests in this module import them.
   equivalent to `store(s => s.count)`.
 - The key set is snapshotted when `createSelectors` runs. Fields added to the state
   afterwards get no selector.
+- `openLinkInBrowser` awaits `Linking.canOpenURL(url)` and opens the URL only
+  when it reports true. Both promises are discarded, so neither a false answer
+  nor a failed open reaches the caller.
 
 ## Entry points
 - `openLinkInBrowser` and `createSelectors` from `@/lib/utils`.

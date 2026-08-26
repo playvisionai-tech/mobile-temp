@@ -71,6 +71,10 @@ and it is the one the type-checker guards.
 - **This module defines no screen-level UI.** The native navigator has no
   header slot, so the "Create" link that used to sit in the Feed tab's
   `headerRight` now lives inside `FeedScreen`.
+- The startup side effects at module scope in `_layout.tsx` — `loadSelectedTheme()`,
+  `initializeFeatureFlags()` and `SplashScreen.preventAutoHideAsync()` — are
+  fire-and-forget. Their promises are explicitly discarded and no render waits on
+  them, so a slow or failed one cannot hold up the first frame.
 
 ## Provider tree
 

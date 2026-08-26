@@ -12,9 +12,10 @@ space lives.
   directly, and callers that need a typed primitive (`storage.getString`,
   `useMMKVBoolean`) use it rather than the helpers below.
 - `getItem<T>(key)` reads the key as a string and `JSON.parse`s it. It returns
-  `null` when the key is unset, when the stored string is empty, and also when
-  the parsed value is itself falsy — `0`, `false`, `""` and `null` all come back
-  as `null`, because the parse result passes through `|| null`.
+  `null` when the key is unset, when the stored string is empty, and when the
+  parsed value is itself `null`. A parsed `0`, `false` or `""` is returned as
+  stored — only nullish parses collapse to `null`. `T` is the caller's claim
+  about the shape; nothing validates it.
 - `setItem<T>(key, value)` `JSON.stringify`s the value and writes it.
 - `removeItem(key)` deletes the key.
 - `setItem` and `removeItem` are declared `async` and so return promises, but the

@@ -18,6 +18,9 @@ and the `translate()` helper features call to render copy.
   Arabic, and then restarts the app so the new direction takes effect.
 - `isRTL` is computed at init from `i18n.dir()`, and `I18nManager.allowRTL` /
   `forceRTL` are applied at module scope on import.
+- `translate`'s `options` is i18next's own `TOptions`. The memo key is the
+  translation key alone when no options are passed, and the key plus the JSON of
+  the options when they are.
 
 ## Entry points
 - Everything is exported from `src/lib/i18n/index.tsx`: `translate`,

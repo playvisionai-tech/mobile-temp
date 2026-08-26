@@ -6,6 +6,8 @@ Internal demo screen showcasing NativeWind/design system components. Not user-fa
 ## Behavior
 - Renders a scrollable list of UI components (Button, Input, Text, Modal) with various states.
 - Used for visual regression testing and design system verification.
+- Each swatch is keyed `<palette>-<shade>` — `charcoal-500`, say — so keys are
+  distinct across the whole demo rather than only within one palette.
 
 ## Entry points
 - Route: `src/app/(app)/style.tsx` → `features/style-demo/style-demo-screen.tsx`
