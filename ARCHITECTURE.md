@@ -40,7 +40,7 @@ Verified against `package.json` and the files that wire each one up.
 | HTTP | `axios` | `src/lib/api/client.tsx` (request + response interceptors) |
 | Client persistence | `react-native-mmkv` ~4 | `src/lib/storage/index.tsx`, `src/lib/hooks/` |
 | Styling | `uniwind` + Tailwind v4 | `src/global.css`, `metro.config.js` |
-| Animation | `react-native-reanimated` ~4, `react-native-worklets`, `moti` | `src/components/ui/` |
+| Animation | `react-native-reanimated` ~4, `react-native-worklets` | `src/components/ui/` |
 | Lists | `@shopify/flash-list` 2 | `src/components/ui/list.tsx`, `src/features/feed/feed-screen.tsx` |
 | i18n | `i18next` + `react-i18next` + `expo-localization` | `src/lib/i18n/` |
 | Forms | `@tanstack/react-form` + `zod` | feature screens, `src/components/ui/form-utils` |

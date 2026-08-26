@@ -291,7 +291,7 @@ The `Checkbox`, `Switch`, and `Radio` components are very similar as they share 
 
 For handling common functionality like handling press events and accessibility states we have the `Root` component. It wraps its children in a `Pressable` component and passes along props.
 
-Animations are applied to the icons using the `MotiView` component from the `moti` library. These animations change the appearance of the icons based on their checked state.
+Animations are applied to the icons using `Animated.View` with `useAnimatedStyle` from `react-native-reanimated`. These animations change the appearance of the icons based on their checked state.
 
 <CodeBlock file="src/components/ui/checkbox.tsx" />
 

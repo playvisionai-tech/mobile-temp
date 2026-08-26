@@ -1,5 +1,4 @@
 import type { PressableProps } from 'react-native';
-import { MotiView } from 'moti';
 import * as React from 'react';
 import { useCallback } from 'react';
 import {
@@ -8,6 +7,11 @@ import {
 
   View,
 } from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated';
 import Svg, { Path } from 'react-native-svg';
 
 import colors from '@/components/ui/colors';
@@ -75,37 +79,34 @@ function Label({ text, testID, className = '' }: LabelProps) {
 
 export function CheckboxIcon({ checked = false }: IconProps) {
   const color = checked ? colors.primary[300] : colors.charcoal[400];
+
+  const border = useAnimatedStyle(() => ({
+    borderColor: withTiming(color, { duration: 100 }),
+  }));
+
+  // The fill and the checkmark share one 100ms fade. The box itself declares
+  // no `backgroundColor` — an animated one does not reach the view here (see
+  // decisions.md), and leaving it unset is also what keeps an unchecked box
+  // reading as the surface behind it in both themes.
+  const fill = useAnimatedStyle(() => ({
+    opacity: withTiming(checked ? 1 : 0, { duration: 100 }),
+  }));
+
   return (
-    <MotiView
-      style={{
-        height: SIZE,
-        width: SIZE,
-        borderColor: color,
-      }}
-      className="items-center justify-center rounded-[5px] border-2"
-      from={{ backgroundColor: 'transparent', borderColor: '#CCCFD6' }}
-      animate={{
-        backgroundColor: checked ? color : 'transparent',
-        borderColor: color,
-      }}
-      transition={{
-        backgroundColor: { type: 'timing', duration: 100 },
-        borderColor: { type: 'timing', duration: 100 },
-      }}
+    <Animated.View
+      style={[{ height: SIZE, width: SIZE }, border]}
+      className="items-center justify-center overflow-hidden rounded-[5px] border-2"
     >
-      <MotiView
-        from={{ opacity: 0 }}
-        animate={{ opacity: checked ? 1 : 0 }}
-        transition={{ opacity: { type: 'timing', duration: 100 } }}
-      >
+      <Animated.View style={fill} className="absolute inset-0 bg-primary-300" />
+      <Animated.View style={fill}>
         <Svg width="24" height="24" viewBox="0 0 24 24" fill="none">
           <Path
             d="m16.726 7-.64.633c-2.207 2.212-3.878 4.047-5.955 6.158l-2.28-1.928-.69-.584L6 12.66l.683.577 2.928 2.477.633.535.591-.584c2.421-2.426 4.148-4.367 6.532-6.756l.633-.64L16.726 7Z"
             fill="#fff"
           />
         </Svg>
-      </MotiView>
-    </MotiView>
+      </Animated.View>
+    </Animated.View>
   );
 }
 
@@ -148,27 +149,25 @@ export const Checkbox = Object.assign(CheckboxBase, {
 
 export function RadioIcon({ checked = false }: IconProps) {
   const color = checked ? colors.primary[300] : colors.charcoal[400];
+
+  const ring = useAnimatedStyle(() => ({
+    borderColor: withTiming(color, { duration: 100 }),
+  }));
+
+  const dot = useAnimatedStyle(() => ({
+    opacity: withTiming(checked ? 1 : 0, { duration: 50 }),
+  }));
+
   return (
-    <MotiView
-      style={{
-        height: SIZE,
-        width: SIZE,
-        borderColor: color,
-      }}
+    <Animated.View
+      style={[{ height: SIZE, width: SIZE }, ring]}
       className="items-center justify-center rounded-[20px] border-2 bg-transparent"
-      from={{ borderColor: '#CCCFD6' }}
-      animate={{
-        borderColor: color,
-      }}
-      transition={{ borderColor: { duration: 100, type: 'timing' } }}
     >
-      <MotiView
-        className={`size-[10px] rounded-[10px] ${checked && 'bg-primary-300'}`}
-        from={{ opacity: 0 }}
-        animate={{ opacity: checked ? 1 : 0 }}
-        transition={{ opacity: { duration: 50, type: 'timing' } }}
+      <Animated.View
+        style={dot}
+        className="size-[10px] rounded-[10px] bg-primary-300"
       />
-    </MotiView>
+    </Animated.View>
   );
 }
 
@@ -211,6 +210,16 @@ export function SwitchIcon({ checked = false }: IconProps) {
 
   const backgroundColor = checked ? colors.primary[300] : colors.charcoal[400];
 
+  const thumb = useAnimatedStyle(() => ({
+    transform: [
+      {
+        translateX: withSpring(I18nManager.isRTL ? translateX : -translateX, {
+          overshootClamping: true,
+        }),
+      },
+    ],
+  }));
+
   return (
     <View className="w-[50px] justify-center">
       <View className="overflow-hidden rounded-full">
@@ -222,19 +231,18 @@ export function SwitchIcon({ checked = false }: IconProps) {
           }}
         />
       </View>
-      <MotiView
-        style={{
-          height: THUMB_HEIGHT,
-          width: THUMB_WIDTH,
-          position: 'absolute',
-          backgroundColor: 'white',
-          borderRadius: 13,
-          right: 0,
-        }}
-        animate={{
-          translateX: I18nManager.isRTL ? translateX : -translateX,
-        }}
-        transition={{ translateX: { overshootClamping: true } }}
+      <Animated.View
+        style={[
+          {
+            height: THUMB_HEIGHT,
+            width: THUMB_WIDTH,
+            position: 'absolute',
+            backgroundColor: 'white',
+            borderRadius: 13,
+            right: 0,
+          },
+          thumb,
+        ]}
       />
     </View>
   );
