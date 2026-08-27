@@ -1,3 +1,4 @@
+import type * as FirebaseMessaging from '@react-native-firebase/messaging';
 import type { Messaging, RemoteMessage } from '@react-native-firebase/messaging';
 
 import type { Href } from 'expo-router';
@@ -13,23 +14,39 @@ import { resolveNotificationTarget } from './targets';
 export * from './targets';
 
 /**
- * The slice of the Messaging modular API this wrapper uses. Declaring it here
- * rather than deriving it from the package keeps the surface we depend on
- * visible in one place, and lets `loadApi` type its `require` result.
+ * The slice of the Messaging modular API this wrapper uses, **derived** from
+ * the package's own exports so that an upstream rename or signature change is a
+ * compile error here rather than a runtime surprise. Naming the eight members
+ * still keeps the surface we depend on visible in one place, and still lets
+ * `loadApi` type its `require` result.
+ *
+ * This diverges from the hand-written contracts in `@/lib/analytics` and
+ * `@/lib/crash-reporting`, and the divergence is the point: analytics cannot be
+ * derived, because that package declares `logEvent` as 27 event-name overloads
+ * plus one generic form and a `Pick` of it will not accept this app's single
+ * generic call shape. Messaging has no such obstacle — every export used here
+ * is one plain signature. Crash reporting has none either and should follow,
+ * in its own change rather than this one.
+ *
+ * The cost is that an upstream rename now breaks the build even where nothing
+ * this module does has changed. That is the trade being made, not a side
+ * effect: a transcription that quietly loses precision is the worse failure.
+ * The one this replaced was already lossier than the package — not wrong, it
+ * still described the real module, but it widened both permission calls to
+ * `Promise<number>` where the package returns `AuthorizationStatus`, and it
+ * dropped `getToken`'s optional parameter.
  */
-type MessagingApi = {
-  getMessaging: () => Messaging;
-  getToken: (messaging: Messaging) => Promise<string>;
-  onTokenRefresh: (messaging: Messaging, listener: (token: string) => void) => () => void;
-  requestPermission: (messaging: Messaging) => Promise<number>;
-  hasPermission: (messaging: Messaging) => Promise<number>;
-  getInitialNotification: (messaging: Messaging) => Promise<RemoteMessage | null>;
-  onNotificationOpenedApp: (
-    messaging: Messaging,
-    listener: (message: RemoteMessage) => void,
-  ) => () => void;
-  onMessage: (messaging: Messaging, listener: (message: RemoteMessage) => void) => () => void;
-};
+type MessagingApi = Pick<
+  typeof FirebaseMessaging,
+  | 'getMessaging'
+  | 'getToken'
+  | 'onTokenRefresh'
+  | 'requestPermission'
+  | 'hasPermission'
+  | 'getInitialNotification'
+  | 'onNotificationOpenedApp'
+  | 'onMessage'
+>;
 
 /**
  * What the app knows about its permission to post notifications.

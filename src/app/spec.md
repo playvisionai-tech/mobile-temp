@@ -52,8 +52,12 @@ and it is the one the type-checker guards.
 - `RootLayout` calls `useNotificationRegistration()` and
   `useNotificationDeepLinks()` from `@/lib/notifications`. The first asks for
   notification permission and takes an FCM device token on mount; the second
-  navigates when a notification is opened, covering all three ways one reaches
-  the app — foreground, background-then-tapped, and cold-started by the tap.
+  subscribes to all three ways a message reaches the app and navigates for the
+  two that are a tap: background-then-tapped, and cold-started by the tap. A
+  message arriving while the app is in the foreground is received and
+  deliberately **not** navigated — neither platform draws a notification while
+  the app is in front, so nothing was tapped and moving a user who is mid-task
+  would be the app acting on its own. Nothing renders it in-app either.
   The deep-link hook can only live here: it needs the root navigator, and a
   notification can start the app from any state, signed out included. A
   notification names a destination that `@/lib/notifications` validates against

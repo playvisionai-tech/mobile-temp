@@ -8,6 +8,12 @@ than throws, and every one is a no-op when the native module is not there, so a
 caller never branches on the environment.
 `@react-native-firebase/messaging` is imported here and nowhere else in `src/`.
 
+The module reaches that package through `require()` at call time, typed by
+`MessagingApi` — a `Pick` of the package's own module type naming the eight
+modular exports used. Nothing a caller can observe depends on this: it is what
+makes an upstream rename or signature change a compile error here instead of a
+runtime one.
+
 ## Nothing here proves a notification was delivered
 The Firebase config files in `firebase/<env>/` are placeholders with fabricated
 keys (see `firebase/README.md`). FCM registers against a project that does not
