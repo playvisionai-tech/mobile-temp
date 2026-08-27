@@ -104,12 +104,15 @@ telemetry identity: `TelemetryIdentity` in `src/features/auth/` watches
 consumers. MMKV is chosen because it reads synchronously, so the theme and the
 first-run flag are available before the first render. It holds **no tokens**.
 
-**Zustand is aspirational.** `AGENTS.md` and the rule files say "client state →
-Zustand". Today the package is a dependency and nothing uses it: the only
-reference in `src/` is a type-only import in `src/lib/utils/index.ts`, feeding a
-`createSelectors` helper that has no store to select from. Treat the rule as
-the intended shape for the first store that needs it, not as a description of
-the code.
+**Other client state → the feature that owns it.** No feature holds any today:
+there is no store anywhere in `src/`, and `zustand` is not a dependency. The
+guide does not ask for one — `AGENTS.md` and
+[`agents/rules/architecture-core.md`](agents/rules/architecture-core.md) say a
+store belongs to its slice (`src/features/<name>/store.ts`, never global, never
+imported across features) and is created **only when the feature already has
+client state to hold**; short of that `useState` is enough, and most features
+need none. The first feature with real client state adds `zustand` and its
+`store.ts` together. This row is empty by design, not by neglect.
 
 ## The spec system
 
@@ -190,9 +193,6 @@ Stated here rather than hidden, so nobody rediscovers them as surprises.
   anyone moved it), and `+html.tsx` is web-only Expo Router plumbing. The
   catch-all's param is also spelled `messing`, which reads like a typo for
   `missing`; renaming it changes a URL, so it has been left alone.
-- **Zustand is a dependency with no store**, and `createSelectors` in
-  `src/lib/utils/index.ts` is a helper with nothing to help. See
-  [Data flow](#data-flow).
 - **`src/lib/auth/` is dead code.** A pre-Clerk MMKV token store that nothing
   imports; its own spec says so.
 - **Tests are thin.** Several directories that hold behavior still have no

@@ -1,29 +1,19 @@
 # utils — current behavior
 
 ## What this feature does
-Two unrelated general-purpose helpers that belong to no feature: opening an
-external URL, and adding per-field selector hooks to a Zustand store. Neither has
-a production caller today — both are template scaffolding kept for the first code
-that needs them, and only the tests in this module import them.
+One general-purpose helper that belongs to no feature: opening an external URL.
+It has no production caller today — it is template scaffolding kept for the first
+code that needs it, and only the tests in this module import it.
 
 ## Behavior
-- `openLinkInBrowser(url)` calls `Linking.canOpenURL(url)` and opens the URL with
-  `Linking.openURL` only if the platform reports it can. It returns `void`, not the
-  promise, so callers cannot await the result or observe a failure.
-- `createSelectors(store)` mutates the passed Zustand store, attaching a `use`
-  object with one hook per key present in `store.getState()` at call time, and
-  returns the same store typed as `WithSelectors<S>`. `store.use.count()` is then
-  equivalent to `store(s => s.count)`.
-- The key set is snapshotted when `createSelectors` runs. Fields added to the state
-  afterwards get no selector.
-- `openLinkInBrowser` awaits `Linking.canOpenURL(url)` and opens the URL only
-  when it reports true. Both promises are discarded, so neither a false answer
-  nor a failed open reaches the caller.
+- `openLinkInBrowser(url)` awaits `Linking.canOpenURL(url)` and opens the URL with
+  `Linking.openURL` only when the platform reports it can. Both promises are
+  discarded — the function returns `void`, not the promise, so neither a false
+  answer nor a failed open reaches the caller.
 
 ## Entry points
-- `openLinkInBrowser` and `createSelectors` from `@/lib/utils`.
-- No production module imports either one. `createSelectors` is written against
-  the Zustand store shape described in AGENTS.md; no such store exists yet.
+- `openLinkInBrowser` from `@/lib/utils`.
+- No production module imports it.
 
 ## Platform differences
 - `openLinkInBrowser` inherits whatever `Linking.canOpenURL` reports per platform —
@@ -33,8 +23,9 @@ that needs them, and only the tests in this module import them.
 ## Out of scope
 - Reporting failure. `openLinkInBrowser` swallows the result of both calls; a URL
   that cannot be opened produces no error and no feedback.
-- Selectors for nested or computed state. `createSelectors` only walks the
-  top-level keys of the state object.
+- Store selector helpers. There is no Zustand store in the app and `zustand` is
+  not a dependency; when a feature first needs client state, it adds both in its
+  own slice per AGENTS.md.
 
 ## Note on the name
 `src/lib/api/`, `src/lib/auth/`, `src/lib/i18n/` and `src/components/ui/` each have

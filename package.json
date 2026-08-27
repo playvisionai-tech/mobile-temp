@@ -101,8 +101,7 @@
     "tailwind-merge": "^3.4.0",
     "tailwind-variants": "^3.2.2",
     "uniwind": "^1.2.4",
-    "zod": "^4.3.5",
-    "zustand": "^5.0.10"
+    "zod": "^4.3.5"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^7.2.0",

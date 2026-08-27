@@ -272,7 +272,6 @@ We value the feedback and contributions of our users, and we encourage you to le
 - [Axios](https://axios-http.com/docs/intro)
 - [TanStack Form](https://tanstack.com/form/latest)
 - [i18next](https://www.i18next.com/)
-- [zustand](https://github.com/pmndrs/zustand)
 - [React Native MMKV](https://github.com/mrousavy/react-native-mmkv)
 - [React Native Gesture Handler](https://docs.swmansion.com/react-native-gesture-handler/docs/)
 - [React Native Reanimated](https://docs.swmansion.com/react-native-reanimated/docs/)

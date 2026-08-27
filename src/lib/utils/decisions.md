@@ -25,3 +25,26 @@ guidance. Documenting it as unused keeps the intent visible instead.
 **Trade-off:** The repo now carries a specced module with no production callers, and
 `src/lib/utils` sits alongside four other unrelated `utils` files. The spec says so
 explicitly rather than letting the name imply a shared base.
+
+## 2026-08-27 — Deleted `createSelectors` and the `zustand` dependency
+**Chose:** Remove the helper, its tests, its type-only `zustand` import, the
+`zustand` declaration in `package.json`, and the now-inert `zustand` entry in
+`jest.config.js` `transformIgnorePatterns`
+**Over:** Keeping it as a ready-made seam for the first Zustand store, which is
+what the 2026-08-25 entry above decided
+**Why:** That entry kept the helper to preserve guidance, but the guidance lives
+in AGENTS.md, which already says a store belongs to its feature at
+`src/features/<name>/store.ts` and that one is created **only when the feature
+already has client state to hold** — "Most features need no store". A global
+selectors helper waiting for a store that may never arrive is exactly the
+speculative shape that guide warns against, and it actively misleads: a reader
+finds a store-selectors utility in `src/lib/` and reasonably infers there are
+stores to use it on. There are none — the last one went with
+`use-auth-store.tsx` in the Clerk migration. Deleting it also drops a dependency
+nothing imports at runtime.
+**Trade-off:** The first feature that genuinely needs a store gets no head start
+— it has to run `pnpm add zustand` (through the add-dependency gate) and, if it
+wants per-field hooks, write the ~10 lines again; with no direct pin left, that
+`pnpm add` can also resolve a version different from the `zustand@5.0.3` already
+hoisted into the tree as a transitive dependency of `@clerk/expo`, leaving two
+copies installed.
