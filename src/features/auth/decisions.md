@@ -1,7 +1,7 @@
 # Auth — decisions
 
 ## 2026-08-20 — Migrated to Clerk for authentication
-**Chose:** @clerk/expo + @clerk/react
+**Chose:** @clerk/expo
 **Over:** Custom JWT + MMKV token storage (previous implementation)
 **Why:** Clerk handles session management, MFA, device verification, and token refresh out of the box. Reduces custom auth code surface area.
 **Trade-off:** Additional dependency; vendor lock-in for auth; requires Clerk account and publishable key.

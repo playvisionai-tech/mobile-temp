@@ -4,7 +4,8 @@
 terminal — auth is exercised by running the app.
 
 ## Where it lives
-- `@clerk/expo` + `@clerk/react` (dependencies).
+- `@clerk/expo` (dependency). It pulls `@clerk/react` in transitively;
+  nothing here imports `@clerk/react` directly.
 - `ClerkProvider` with `tokenCache` from `@clerk/expo/token-cache`
   (`expo-secure-store`-backed) in `src/app/_layout.tsx`.
 - Sign-in: `useSignIn()` in `src/features/auth/login-screen.tsx`.

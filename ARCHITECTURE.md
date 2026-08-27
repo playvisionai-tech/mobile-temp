@@ -34,7 +34,7 @@ Verified against `package.json` and the files that wire each one up.
 | Concern | Package | Wired in |
 |---|---|---|
 | Routing | `expo-router` ~6 | `src/app/`, entry is `expo-router/entry` |
-| Auth | `@clerk/expo` ^4, `@clerk/react` ^6 | `ClerkProvider` in `src/app/_layout.tsx` |
+| Auth | `@clerk/expo` ^4 | `ClerkProvider` in `src/app/_layout.tsx` |
 | Token persistence | `expo-secure-store` (via Clerk's `tokenCache`) | `src/app/_layout.tsx` |
 | Server state | `@tanstack/react-query` ^5 + `react-query-kit` | `src/lib/api/provider.tsx`, `src/features/feed/api.ts` |
 | HTTP | `axios` | `src/lib/api/client.tsx` (request + response interceptors) |
