@@ -25,10 +25,10 @@ including the platform toolchain and troubleshooting:
   step of `pnpm check-all`.
 - `expo:doctor:skip` – `SKIP_DOCTOR=1 pnpm check-all` (or `pnpm run doctor`)
   skips the doctor step. **Use it when you are offline:** two of doctor's 18
-  checks have to reach Expo's servers, so with no network `check-all` spends
-  ~93s to fail on them after every local check has already passed. The variable
-  is tested for **non-emptiness**, so `SKIP_DOCTOR=0` skips too — any value
-  means skip; unset it to run doctor.
+  checks have to reach Expo's servers, so with no network the whole `check-all`
+  run takes ~93s end to end to fail on them, after every local check has
+  already passed. The variable is tested for **non-emptiness**, so
+  `SKIP_DOCTOR=0` skips too — any value means skip; unset it to run doctor.
 - `expo:build:ios` – `pnpm build:production:ios`
 - `expo:build:android` – `pnpm build:production:android`
 - `expo:submit` – EAS submit (if configured)

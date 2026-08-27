@@ -152,8 +152,9 @@ no separate doctor step to remember. Note `run` is required: plain `pnpm doctor`
 runs pnpm's own builtin `doctor`, exits 0 and checks nothing.
 
 `SKIP_DOCTOR=1 pnpm check-all` skips the doctor step. It exists for working
-offline — doctor needs the network and takes ~74s to fail without it. **Do not
-use it on a change that touched `package.json`**: doctor is the only local check
+offline — doctor needs the network, and offline the doctor step alone burns
+~74s before it gives up (~93s for the whole `check-all` run). **Do not use it
+on a change that touched `package.json`**: doctor is the only local check
 that catches a version off the SDK pin table, which is the whole point of this
 skill. CI runs it regardless — `expo-doctor.yml` fires on every PR touching
 `package.json` or the lockfile, and is the only job on a default PR run that
