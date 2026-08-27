@@ -96,7 +96,7 @@ if [ "$VERIFY" -eq 1 ]; then
   pnpm run type-check  && ok 'type-check'
   pnpm run test        && ok 'tests'
   pnpm run check-specs && ok 'specs'
-  npx expo-doctor@latest || warn 'expo-doctor reported issues (see above)'
+  pnpm run doctor      || warn 'expo-doctor reported issues (see above)'
 fi
 
 # ----------------------------------------------------------------------- next
@@ -107,7 +107,8 @@ Setup complete.
   pnpm start          start the dev server
   pnpm ios            build and run on iOS
   pnpm android        build and run on Android
-  pnpm check-all      lint + type-check + translations + tests + specs
+  pnpm check-all      lint + type-check + translations + tests + specs +
+                      expo-doctor (SKIP_DOCTOR=1 drops doctor when offline)
 
 This app uses native modules (@clerk/expo, expo-secure-store, MMKV), so it
 cannot run in Expo Go. You need a development build:

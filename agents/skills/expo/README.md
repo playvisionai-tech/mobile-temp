@@ -13,7 +13,9 @@ clone must prebuild before it can run anything. Full walkthrough:
 - `expo:ios` → `pnpm ios`
 - `expo:android` → `pnpm android`
 - `expo:web` → `pnpm web`
-- `expo:doctor` → `pnpm doctor`
+- `expo:doctor` → `pnpm run doctor` (`run` is required — plain `pnpm doctor`
+  hits pnpm's builtin, exits 0 and checks nothing). Also the last step of
+  `pnpm check-all`; `SKIP_DOCTOR=1` skips it.
 - `expo:build:ios` → `pnpm build:production:ios`
 - `expo:build:android` → `pnpm build:production:android`
 - `expo:submit` → EAS submit. `eas.json` declares empty `submit.preview` and

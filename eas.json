@@ -4,7 +4,6 @@
   },
   "build": {
     "production": {
-      "channel": "production",
       "autoIncrement": true,
       "distribution": "store",
       "environment": "production",
@@ -20,7 +19,6 @@
       }
     },
     "preview": {
-      "channel": "preview",
       "autoIncrement": true,
       "distribution": "store",
       "ios": {
