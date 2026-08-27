@@ -43,7 +43,7 @@ Post a proposal with:
 5. **Blast radius**: which `spec.md` files change, whether the
    `components/ui/spec.md` inventory changes, whether any `.maestro/` flow breaks.
 6. **Maintenance signal**: last publish date, open issues, whether React Native
-   Directory lists it (`expo-doctor` checks this in CI).
+   Directory lists it (`expo-doctor` checks this, in CI and in `pnpm check-all`).
 
 A native module needs a **named human** to approve, not another agent. A
 JS-only dependency may proceed on the requesting user's approval.
@@ -143,17 +143,22 @@ rule.
 ## 5. Verify
 
 ```bash
-pnpm type-check
-pnpm lint
-pnpm test
-pnpm check-specs
-pnpm doctor        # expo-doctor: SDK alignment + RN Directory
+pnpm check-all     # lint → type-check → translations → test → check-specs → doctor
 ```
 
-`pnpm check-all` runs the first four plus `lint:translations`, but **not**
-`doctor`. Run `doctor` separately whenever `package.json` changed — CI does,
-and `expo-doctor.yml` is the only job on a default PR run that touches native at
-all: it runs a real `pnpm run prebuild`.
+`check-all` ends with `pnpm run doctor` (expo-doctor: SDK alignment + RN
+Directory), so for a dependency change it is sufficient on its own — there is
+no separate doctor step to remember. Note `run` is required: plain `pnpm doctor`
+runs pnpm's own builtin `doctor`, exits 0 and checks nothing.
+
+`SKIP_DOCTOR=1 pnpm check-all` skips the doctor step. It exists for working
+offline — doctor needs the network, and offline the doctor step alone burns
+~74s before it gives up (~93s for the whole `check-all` run). **Do not use it
+on a change that touched `package.json`**: doctor is the only local check
+that catches a version off the SDK pin table, which is the whole point of this
+skill. CI runs it regardless — `expo-doctor.yml` fires on every PR touching
+`package.json` or the lockfile, and is the only job on a default PR run that
+touches native at all: it runs a real `pnpm run prebuild`.
 
 For a native module, none of the above proves it works. Build and run it on a
 real simulator, and drive the affected screens (see `agents/rules/argent.md`).

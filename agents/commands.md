@@ -19,7 +19,16 @@ including the platform toolchain and troubleshooting:
 - `expo:ios` – `pnpm ios`
 - `expo:android` – `pnpm android`
 - `expo:web` – `pnpm web`
-- `expo:doctor` – `pnpm doctor`
+- `expo:doctor` – `pnpm run doctor` (`npx expo-doctor@latest`). **`run` is
+  required** — plain `pnpm doctor` silently runs pnpm's own builtin `doctor`
+  command instead of this script, exits 0 and checks nothing. Also the last
+  step of `pnpm check-all`.
+- `expo:doctor:skip` – `SKIP_DOCTOR=1 pnpm check-all` (or `pnpm run doctor`)
+  skips the doctor step. **Use it when you are offline:** two of doctor's 18
+  checks have to reach Expo's servers, so with no network the whole `check-all`
+  run takes ~93s end to end to fail on them, after every local check has
+  already passed. The variable is tested for **non-emptiness**, so
+  `SKIP_DOCTOR=0` skips too — any value means skip; unset it to run doctor.
 - `expo:build:ios` – `pnpm build:production:ios`
 - `expo:build:android` – `pnpm build:production:android`
 - `expo:submit` – EAS submit (if configured)
@@ -57,7 +66,11 @@ Read `src/features/auth/spec.md` before changing any of it. Details:
 - `lint:translations` – `pnpm lint:translations`
 - `lint:specs` – `pnpm check-specs` (spec drift; also runs in CI)
 - `lint:all` – `pnpm check-all` (lint → type-check → translations → test →
-  check-specs)
+  check-specs → doctor). Cheap-first: it stops at the first failure, and
+  `doctor` is last because it is the only step that hits the network
+  (~4s on a warm npx cache, on top of ~18s for the rest) — so an offline
+  machine still gets every local verdict before it fails. Offline, skip it
+  outright: `SKIP_DOCTOR=1 pnpm check-all` (see `expo:doctor:skip` above).
 
 ## build
 - `build:ios` – `pnpm build:production:ios`

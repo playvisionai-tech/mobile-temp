@@ -207,5 +207,6 @@ Stated here rather than hidden, so nobody rediscovers them as surprises.
   from the console. See [`firebase/README.md`](firebase/README.md).
 - **There is no single CI pipeline.** The workflows in `.github/workflows/` are
   independent jobs that run in parallel. The ordered sequence
-  (`lint → type-check → translations → test → check-specs`) exists only as the
-  local `pnpm check-all`.
+  (`lint → type-check → translations → test → check-specs → doctor`) exists only
+  as the local `pnpm check-all`. `doctor` is last because it is the only step
+  that needs the network; `SKIP_DOCTOR=1` drops it for offline work.

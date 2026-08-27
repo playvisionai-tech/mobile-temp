@@ -110,7 +110,10 @@ and put it in `.env`.
   Metro will not pick up new native code on its own.
 - **Stale native build?** `pnpm prebuild:development --clean` regenerates from
   scratch. Deleting `ios/` and `android/` is equivalent since they are generated.
-- **Check your setup:** `pnpm doctor` runs expo-doctor against the project.
+- **Check your setup:** `pnpm run doctor` runs expo-doctor against the project
+  (the `run` matters — plain `pnpm doctor` is pnpm's own builtin and checks
+  nothing). It is also the last step of `pnpm check-all`; set `SKIP_DOCTOR=1`
+  to skip it when you are offline.
 
 ## 🔥 Firebase
 

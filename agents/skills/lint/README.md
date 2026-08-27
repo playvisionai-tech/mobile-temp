@@ -10,7 +10,9 @@
   changed module under `src/features/`, `src/lib/` or `src/components/ui/` has no
   spec update; also runs in `.github/workflows/drift-check.yml`)
 - `lint:all` → `pnpm check-all` (lint → type-check → translations → test →
-  check-specs)
+  check-specs → doctor). Stops at the first failure. `doctor` is last because it
+  is the only step that hits the network (~4s warm, on top of ~18s for the rest);
+  `SKIP_DOCTOR=1 pnpm check-all` drops it for offline work.
 
 `agents/**`, `.agents/**`, `.claude/**`, `docs/`, `cli/` and the root
 `session-*.md` transcripts are eslint-ignored, so editing docs there does not

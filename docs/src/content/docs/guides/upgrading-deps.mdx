@@ -135,7 +135,7 @@ There is no one-size-fits-all solution for managing updates to your project's de
 We recommend to start updating `devDependencies` first by following this process:
 
 1. Select all `devDependencies` and update them to the latest version.
-2. Run `pnpm doctor` to revert any changes that are not in sync with the Expo version you are using.
+2. Run `pnpm run doctor` to report any dependencies that are not in sync with the Expo version you are using. It only checks — it never edits `package.json` or `pnpm-lock.yaml`. Run `pnpm expo install --fix` to actually realign the ones it flags.
 3. Run your checks to make sure everything is working as expected.
 
 ```bash
