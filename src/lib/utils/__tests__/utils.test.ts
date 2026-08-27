@@ -1,7 +1,6 @@
-import type { StoreApi, UseBoundStore } from 'zustand';
 import { Linking } from 'react-native';
 
-import { createSelectors, openLinkInBrowser } from '@/lib/utils';
+import { openLinkInBrowser } from '@/lib/utils';
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -27,22 +26,5 @@ describe('openLinkInBrowser', () => {
     await Promise.resolve();
 
     expect(openURL).not.toHaveBeenCalled();
-  });
-});
-
-describe('createSelectors', () => {
-  it('adds one selector hook for every store field', () => {
-    const state = { count: 2, label: 'two' };
-    const store = Object.assign(
-      jest.fn(selector => selector(state)),
-      { getState: () => state },
-    );
-
-    const selectedStore = createSelectors(
-      store as unknown as UseBoundStore<StoreApi<typeof state>>,
-    );
-
-    expect(selectedStore.use.count()).toBe(2);
-    expect(selectedStore.use.label()).toBe('two');
   });
 });
