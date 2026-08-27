@@ -28,6 +28,12 @@ Re-exported unchanged from React Native / safe-area-context so features import
 them from one place: `View`, `ScrollView`, `Pressable`, `TouchableOpacity`,
 `ActivityIndicator`, `SafeAreaView`.
 
+`SafeAreaView` is the exception to "everything takes a `className`": uniwind
+rewrites React Native's own components, and this one comes from
+`react-native-safe-area-context`, which renders the `RNCSafeAreaView` host
+component directly. A `className` on it is silently dropped — `edges` and
+`style` are what it reads. Style the `View` around it or the one inside it.
+
 Not in the barrel, import directly: `getFieldError` from
 `@/components/ui/form-utils` (maps a `@tanstack/react-form` field to `Input`'s
 `error` prop), the icon set in `@/components/ui/icons`, and
