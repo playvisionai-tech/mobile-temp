@@ -1,0 +1,19 @@
+diff --git a/ios/RNFBMessaging/RNFBMessagingModule.mm b/ios/RNFBMessaging/RNFBMessagingModule.mm
+index 25b9f31e6ef0cc60ef52513f44d592684eeaf462..a45e3624c3a6a3bca68a27d438c64377c95cccb9 100644
+--- a/ios/RNFBMessaging/RNFBMessagingModule.mm
++++ b/ios/RNFBMessaging/RNFBMessagingModule.mm
+@@ -83,12 +83,12 @@ - (NSDictionary *)messagingConstantsDictionary {
+   return constants;
+ }
+ 
+-- (facebook::react::ModuleConstants<JS::NativeRNFBTurboMessaging::Constants::Builder>)
++- (facebook::react::ModuleConstants<JS::NativeRNFBTurboMessaging::Constants>)
+     constantsToExport {
+   return [_RCTTypedModuleConstants newWithUnsafeDictionary:[self messagingConstantsDictionary]];
+ }
+ 
+-- (facebook::react::ModuleConstants<JS::NativeRNFBTurboMessaging::Constants::Builder>)getConstants {
++- (facebook::react::ModuleConstants<JS::NativeRNFBTurboMessaging::Constants>)getConstants {
+   return [self constantsToExport];
+ }
+ 

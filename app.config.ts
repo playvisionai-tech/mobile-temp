@@ -31,10 +31,20 @@ const appIconBadgeConfig: AppIconBadgeConfig = {
 // projects; `analytics` and `crashlytics` add their own Podfile / Gradle mods;
 // remote-config ships no config plugin. Both iOS flags are load-bearing —
 // firebase/README.md explains the two `pod install` failures they fix.
+//
+// `messaging`'s plugin contributes the Android notification icon and colour
+// meta-data and nothing else — with no icon configured it writes nothing at
+// all, and `expo config --type introspect` shows zero occurrences of either
+// key. FCM's permissions and services are NOT its doing: POST_NOTIFICATIONS,
+// c2dm.permission.RECEIVE and the messaging services come from the library's
+// own AAR manifests through autolinking and the Gradle manifest merge, so
+// they are in the APK whether or not this entry is present. It is listed for
+// the icon/colour hook and so the plugin set matches the installed packages.
 const firebasePlugins: ExpoConfig['plugins'] = [
   ['@react-native-firebase/app', { ios: { disableSPM: true } }],
   '@react-native-firebase/analytics',
   '@react-native-firebase/crashlytics',
+  '@react-native-firebase/messaging',
   ['expo-build-properties', { ios: { useFrameworks: 'static' } }],
 ];
 

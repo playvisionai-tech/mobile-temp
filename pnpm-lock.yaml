@@ -11,6 +11,9 @@ patchedDependencies:
   '@react-native-firebase/crashlytics@26.3.2':
     hash: 431c37f46f4d497557d9a0c7c0d8904008b8f14e3edccfee93be7d9f12604c06
     path: patches/@react-native-firebase__crashlytics@26.3.2.patch
+  '@react-native-firebase/messaging@26.3.2':
+    hash: ee9658b519a7a6dfc87cac2d90daf4353ee017158624972b2d923e6a901028f7
+    path: patches/@react-native-firebase__messaging@26.3.2.patch
   '@react-native-firebase/remote-config@26.3.2':
     hash: 58d84687348d1c4f1fba6e0da7b5bc8a5481966de774532e3c5d170e2cc4a847
     path: patches/@react-native-firebase__remote-config@26.3.2.patch
@@ -43,6 +46,9 @@ importers:
       '@react-native-firebase/crashlytics':
         specifier: 26.3.2
         version: 26.3.2(patch_hash=431c37f46f4d497557d9a0c7c0d8904008b8f14e3edccfee93be7d9f12604c06)(@react-native-firebase/app@26.3.2(patch_hash=dbb71eece963f875d5f781317c6815f3535436877381fa25af95fbd2c4fe0722)(expo@54.0.37)(react-native@0.81.5(@babel/core@7.28.6)(@types/react@19.1.17)(bufferutil@4.1.0)(react@19.1.0)(utf-8-validate@6.0.6))(react@19.1.0))(expo@54.0.37)
+      '@react-native-firebase/messaging':
+        specifier: 26.3.2
+        version: 26.3.2(patch_hash=ee9658b519a7a6dfc87cac2d90daf4353ee017158624972b2d923e6a901028f7)(@react-native-firebase/app@26.3.2(patch_hash=dbb71eece963f875d5f781317c6815f3535436877381fa25af95fbd2c4fe0722)(expo@54.0.37)(react-native@0.81.5(@babel/core@7.28.6)(@types/react@19.1.17)(bufferutil@4.1.0)(react@19.1.0)(utf-8-validate@6.0.6))(react@19.1.0))(expo@54.0.37)
       '@react-native-firebase/remote-config':
         specifier: 26.3.2
         version: 26.3.2(patch_hash=58d84687348d1c4f1fba6e0da7b5bc8a5481966de774532e3c5d170e2cc4a847)(@react-native-firebase/analytics@26.3.2(@react-native-firebase/app@26.3.2(patch_hash=dbb71eece963f875d5f781317c6815f3535436877381fa25af95fbd2c4fe0722)(expo@54.0.37)(react-native@0.81.5(@babel/core@7.28.6)(@types/react@19.1.17)(bufferutil@4.1.0)(react@19.1.0)(utf-8-validate@6.0.6))(react@19.1.0))(expo@54.0.37))(@react-native-firebase/app@26.3.2(patch_hash=dbb71eece963f875d5f781317c6815f3535436877381fa25af95fbd2c4fe0722)(expo@54.0.37)(react-native@0.81.5(@babel/core@7.28.6)(@types/react@19.1.17)(bufferutil@4.1.0)(react@19.1.0)(utf-8-validate@6.0.6))(react@19.1.0))
@@ -2675,6 +2681,15 @@ packages:
 
   '@react-native-firebase/crashlytics@26.3.2':
     resolution: {integrity: sha512-bljAZnRtdV+fu/hZKqDrgz7IrNjzq55yZqQZfK2GR/heYEoBR3s5EQmWHg9KGgsG6xMLY56zZ9mnuUmgILA7tg==}
+    peerDependencies:
+      '@react-native-firebase/app': 26.3.2
+      expo: '>=47.0.0'
+    peerDependenciesMeta:
+      expo:
+        optional: true
+
+  '@react-native-firebase/messaging@26.3.2':
+    resolution: {integrity: sha512-iLFBQW8EJerqVyh2TrhZMoQbA5Se1LnLZVBhbNrcWzrrHl/H212J0XcAxITmGmJxvHZMw8uZEve+31oGl5hiGg==}
     peerDependencies:
       '@react-native-firebase/app': 26.3.2
       expo: '>=47.0.0'
@@ -12878,6 +12893,12 @@ snapshots:
     dependencies:
       '@react-native-firebase/app': 26.3.2(patch_hash=dbb71eece963f875d5f781317c6815f3535436877381fa25af95fbd2c4fe0722)(expo@54.0.37)(react-native@0.81.5(@babel/core@7.28.6)(@types/react@19.1.17)(bufferutil@4.1.0)(react@19.1.0)(utf-8-validate@6.0.6))(react@19.1.0)
       stacktrace-js: 2.0.2
+    optionalDependencies:
+      expo: 54.0.37(@babel/core@7.28.6)(@expo/metro-runtime@6.1.2)(bufferutil@4.1.0)(expo-router@6.0.24)(react-native@0.81.5(@babel/core@7.28.6)(@types/react@19.1.17)(bufferutil@4.1.0)(react@19.1.0)(utf-8-validate@6.0.6))(react@19.1.0)(utf-8-validate@6.0.6)
+
+  '@react-native-firebase/messaging@26.3.2(patch_hash=ee9658b519a7a6dfc87cac2d90daf4353ee017158624972b2d923e6a901028f7)(@react-native-firebase/app@26.3.2(patch_hash=dbb71eece963f875d5f781317c6815f3535436877381fa25af95fbd2c4fe0722)(expo@54.0.37)(react-native@0.81.5(@babel/core@7.28.6)(@types/react@19.1.17)(bufferutil@4.1.0)(react@19.1.0)(utf-8-validate@6.0.6))(react@19.1.0))(expo@54.0.37)':
+    dependencies:
+      '@react-native-firebase/app': 26.3.2(patch_hash=dbb71eece963f875d5f781317c6815f3535436877381fa25af95fbd2c4fe0722)(expo@54.0.37)(react-native@0.81.5(@babel/core@7.28.6)(@types/react@19.1.17)(bufferutil@4.1.0)(react@19.1.0)(utf-8-validate@6.0.6))(react@19.1.0)
     optionalDependencies:
       expo: 54.0.37(@babel/core@7.28.6)(@expo/metro-runtime@6.1.2)(bufferutil@4.1.0)(expo-router@6.0.24)(react-native@0.81.5(@babel/core@7.28.6)(@types/react@19.1.17)(bufferutil@4.1.0)(react@19.1.0)(utf-8-validate@6.0.6))(react@19.1.0)(utf-8-validate@6.0.6)
 

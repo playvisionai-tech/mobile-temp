@@ -49,6 +49,17 @@ and it is the one the type-checker guards.
   `screen_view` on every router path change. Native automatic screen reporting
   is disabled in the root `firebase.json`, so this hook is the only source of
   screen analytics.
+- `RootLayout` calls `useNotificationRegistration()` and
+  `useNotificationDeepLinks()` from `@/lib/notifications`. The first asks for
+  notification permission and takes an FCM device token on mount; the second
+  navigates when a notification is opened, covering all three ways one reaches
+  the app — foreground, background-then-tapped, and cold-started by the tap.
+  The deep-link hook can only live here: it needs the root navigator, and a
+  notification can start the app from any state, signed out included. A
+  notification names a destination that `@/lib/notifications` validates against
+  `ROUTES`; `login` and `onboarding` are not reachable that way. Both hooks are
+  no-ops without the native module, and what they send is that module's
+  behavior, described in `src/lib/notifications/spec.md`.
 - `RootLayout` also mounts `<TelemetryIdentity />` from
   `@/features/auth/telemetry-identity` as the first child of `ClerkProvider`.
   It renders nothing; it sets the analytics and Crashlytics user id from Clerk's
@@ -80,6 +91,9 @@ and it is the one the type-checker guards.
 - **This module defines no screen-level UI.** The native navigator has no
   header slot, so the "Create" link that used to sit in the Feed tab's
   `headerRight` now lives inside `FeedScreen`.
+- A deep link from a notification is navigated with `router.navigate`, and it is
+  subject to the `(app)` guard like any other navigation: a target inside the
+  group still redirects a signed-out user to `/login`.
 - The startup side effects at module scope in `_layout.tsx` — `loadSelectedTheme()`,
   `initializeFeatureFlags()` and `SplashScreen.preventAutoHideAsync()` — are
   fire-and-forget. Their promises are explicitly discarded and no render waits on
