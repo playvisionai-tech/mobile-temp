@@ -55,6 +55,7 @@
     "@react-native-firebase/analytics": "26.3.2",
     "@react-native-firebase/app": "26.3.2",
     "@react-native-firebase/crashlytics": "26.3.2",
+    "@react-native-firebase/messaging": "26.3.2",
     "@react-native-firebase/remote-config": "26.3.2",
     "@react-native-vector-icons/get-image": "13.0.0",
     "@react-native-vector-icons/material-design-icons": "13.1.3",

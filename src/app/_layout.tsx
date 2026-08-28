@@ -20,6 +20,7 @@ import { useScreenTracking } from '@/lib/analytics';
 import { APIProvider } from '@/lib/api';
 import { initializeFeatureFlags } from '@/lib/feature-flags';
 import { loadSelectedTheme } from '@/lib/hooks/use-selected-theme';
+import { useNotificationDeepLinks, useNotificationRegistration } from '@/lib/notifications';
 // Import  global CSS file
 import '../global.css';
 
@@ -51,6 +52,13 @@ export default function RootLayout() {
   // view controller cannot see logical screens. The router is the only source
   // of truth for what screen a user is on, so screen_view is logged from here.
   useScreenTracking();
+
+  // Push notifications. Registration asks for permission and takes a device
+  // token; the deep-link hook covers all three ways a tapped notification
+  // reaches the app, and needs the root navigator, which is why it is here and
+  // not in a feature. Both are no-ops without the native module.
+  useNotificationRegistration();
+  useNotificationDeepLinks();
 
   const onLayoutRootView = React.useCallback(() => {
     if (hasHiddenSplash.current) {

@@ -49,6 +49,21 @@ and it is the one the type-checker guards.
   `screen_view` on every router path change. Native automatic screen reporting
   is disabled in the root `firebase.json`, so this hook is the only source of
   screen analytics.
+- `RootLayout` calls `useNotificationRegistration()` and
+  `useNotificationDeepLinks()` from `@/lib/notifications`. The first asks for
+  notification permission and takes an FCM device token on mount; the second
+  subscribes to all three ways a message reaches the app and navigates for the
+  two that are a tap: background-then-tapped, and cold-started by the tap. A
+  message arriving while the app is in the foreground is received and
+  deliberately **not** navigated — neither platform draws a notification while
+  the app is in front, so nothing was tapped and moving a user who is mid-task
+  would be the app acting on its own. Nothing renders it in-app either.
+  The deep-link hook can only live here: it needs the root navigator, and a
+  notification can start the app from any state, signed out included. A
+  notification names a destination that `@/lib/notifications` validates against
+  `ROUTES`; `login` and `onboarding` are not reachable that way. Both hooks are
+  no-ops without the native module, and what they send is that module's
+  behavior, described in `src/lib/notifications/spec.md`.
 - `RootLayout` also mounts `<TelemetryIdentity />` from
   `@/features/auth/telemetry-identity` as the first child of `ClerkProvider`.
   It renders nothing; it sets the analytics and Crashlytics user id from Clerk's
@@ -80,6 +95,9 @@ and it is the one the type-checker guards.
 - **This module defines no screen-level UI.** The native navigator has no
   header slot, so the "Create" link that used to sit in the Feed tab's
   `headerRight` now lives inside `FeedScreen`.
+- A deep link from a notification is navigated with `router.navigate`, and it is
+  subject to the `(app)` guard like any other navigation: a target inside the
+  group still redirects a signed-out user to `/login`.
 - The startup side effects at module scope in `_layout.tsx` — `loadSelectedTheme()`,
   `initializeFeatureFlags()` and `SplashScreen.preventAutoHideAsync()` — are
   fire-and-forget. Their promises are explicitly discarded and no render waits on

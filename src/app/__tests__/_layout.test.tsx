@@ -6,6 +6,7 @@ import { setAnalyticsUser, useScreenTracking } from '@/lib/analytics';
 import { setCrashUser } from '@/lib/crash-reporting';
 import { initializeFeatureFlags } from '@/lib/feature-flags';
 import { loadSelectedTheme } from '@/lib/hooks/use-selected-theme';
+import { useNotificationDeepLinks, useNotificationRegistration } from '@/lib/notifications';
 import { fireEvent, render, screen } from '@/lib/test-utils';
 
 import RootLayout from '../_layout';
@@ -93,6 +94,13 @@ jest.mock('@/lib/feature-flags', () => ({
   initializeFeatureFlags: jest.fn(() => Promise.resolve()),
 }));
 
+// Push notifications are covered by their own tests. Here the observable
+// behavior is only that the root layout mounts both hooks.
+jest.mock('@/lib/notifications', () => ({
+  useNotificationDeepLinks: jest.fn(),
+  useNotificationRegistration: jest.fn(),
+}));
+
 describe('root layout', () => {
   it('initializes startup services and declares the root stack', () => {
     render(<RootLayout />);
@@ -111,6 +119,14 @@ describe('root layout', () => {
     // Module scope: fired on import, before anything rendered.
     expect(initializeFeatureFlags).toHaveBeenCalled();
     expect(useScreenTracking).toHaveBeenCalled();
+  });
+
+  it('asks for push permission and listens for notification taps', () => {
+    render(<RootLayout />);
+
+    expect(useNotificationRegistration).toHaveBeenCalled();
+    // Deep links need the root navigator, so this hook can only live here.
+    expect(useNotificationDeepLinks).toHaveBeenCalled();
   });
 
   it('identifies the Clerk session to telemetry from inside the provider', () => {
